@@ -1,0 +1,40 @@
+{
+  "Frequency": 100000000,
+  "PreTriggerSamples": 512,
+  "PostTriggerSamples": 65000,
+  "TotalSamples": 65512,
+  "LoopCount": 0,
+  "MeasureBursts": false,
+  "CaptureChannels": [
+    {
+      "ChannelNumber": 8,
+      "ChannelName": "Data",
+      "ChannelColor": null,
+      "Hidden": false
+    },
+    {
+      "ChannelNumber": 9,
+      "ChannelName": "Write",
+      "ChannelColor": null,
+      "Hidden": false
+    },
+    {
+      "ChannelNumber": 10,
+      "ChannelName": "CS1",
+      "ChannelColor": null,
+      "Hidden": false
+    },
+    {
+      "ChannelNumber": 11,
+      "ChannelName": "CS2",
+      "ChannelColor": null,
+      "Hidden": false
+    }
+  ],
+  "Bursts": [],
+  "TriggerType": 0,
+  "TriggerChannel": 10,
+  "TriggerInverted": true,
+  "TriggerBitCount": 0,
+  "TriggerPattern": 0
+}
