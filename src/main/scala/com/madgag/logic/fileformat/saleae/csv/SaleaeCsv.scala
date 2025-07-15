@@ -6,8 +6,8 @@ import com.madgag.logic.{ChannelMapping, ChannelSignals, Time, TimeParser}
 object SaleaeCsv {
 
   def format[T: Time, Channel](
-    channelMapping: ChannelMapping[Channel],
-    timeParser: TimeParser[T]
+    timeParser: TimeParser[T],
+    channelMapping: ChannelMapping[Channel]
   ): CSVLogicFormat[T, Channel] = new CSVLogicFormat[T, Channel] {
 
     override def to = (signals: ChannelSignals[T, Channel]) =>

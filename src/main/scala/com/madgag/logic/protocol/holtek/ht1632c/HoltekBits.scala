@@ -1,7 +1,11 @@
 package com.madgag.logic.protocol.holtek.ht1632c
 
 import cats.kernel.Order.*
+import com.github.tototoshi.csv.CSVReader
 import com.madgag.logic.Time.*
+import com.madgag.logic.fileformat.Foo
+import com.madgag.logic.fileformat.Record.csvReaderForResource
+import com.madgag.logic.fileformat.saleae.csv.SaleaeCsv
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.{ChipSelect, Clock}
 import com.madgag.logic.protocol.holtek.ht1632c.operations.*
 import com.madgag.logic.{ChannelMapping, ChannelSignals, Time, TimeParser}
@@ -10,11 +14,8 @@ import scala.collection.immutable.SortedMap
 
 object HoltekBits {
 
-  def loadResource[T: Time](name: String, timeParser: TimeParser[T], channelMapping: ChannelMapping[Channel]): ChannelSignals[T, Channel] = {
-    val burma = ??? // rowsForResource(name).map(channelMapping.parse(_, timeParser))
-//    println(s"Got ${burma.size}")
-    channelMapping.signals(burma)
-  }
+  def loadResource[T: Time](name: String, timeParser: TimeParser[T], channelMapping: ChannelMapping[Channel]): ChannelSignals[T, Channel] =
+    Foo.read(SaleaeCsv.format(timeParser, channelMapping))(csvReaderForResource(name))
 
 //  def loadGusman(name: String, rowDuration: Duration, channelMapping: ChannelMapping[Channel]): ChannelSignals[Duration, Channel] =
 //    GusmanBCaptureCSV.parse(rowsForResource(name), rowDuration, channelMapping)

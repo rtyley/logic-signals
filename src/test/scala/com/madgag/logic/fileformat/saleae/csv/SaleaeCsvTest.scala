@@ -20,7 +20,7 @@ class SaleaeCsvTest extends AnyFlatSpec with should.Matchers {
       "Write" -> Clock.Write,
       "Data" -> Data
     )
-    val format: CSVLogicFormat[Delta, Channel] = SaleaeCsv.format(channelMapping, TimeParser.DeltaParser)
+    val format: CSVLogicFormat[Delta, Channel] = SaleaeCsv.format(TimeParser.DeltaParser, channelMapping)
 
     val bunk: ChannelSignals[Delta, Channel] = Foo.read(format)(csvReaderForResource("/saleae-export.csv"))
 

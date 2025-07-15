@@ -6,7 +6,6 @@ import com.madgag.logic.TimeParser.TimeFormat
 
 import java.lang.Math.round
 import java.time.Duration.ofNanos
-import scala.concurrent.duration.Duration
 
 object TimeParser {
   type TimeFormat[T] = String <=> T
