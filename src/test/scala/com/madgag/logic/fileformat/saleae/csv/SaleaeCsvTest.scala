@@ -1,6 +1,6 @@
 package com.madgag.logic.fileformat.saleae.csv
 
-import com.github.tototoshi.csv.CSVWriter
+import com.github.tototoshi.csv.{CSVReader, CSVWriter}
 import com.madgag.logic.Time.Delta
 import com.madgag.logic.fileformat.*
 import com.madgag.logic.fileformat.Record.csvReaderForResource
@@ -11,9 +11,16 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 
 import java.io.StringWriter
+import scala.io.Source
 
 class SaleaeCsvTest extends AnyFlatSpec with should.Matchers {
   "Saleae CSV export format" should "round-trip" in {
+    def summarise(csvText: String): Unit = {
+      val lines = csvText.linesIterator.toSeq
+      println(s"start:\n${lines.take(3).mkString("\n")}")
+      println(s"end:\n${lines.takeRight(3).mkString("\n")}")
+    }
+
     val channelMapping = ChannelMapping[Channel](
       "Chip Select" -> ChipSelect.Follower.One,
       "What dat" -> ChipSelect.Leader,
@@ -22,15 +29,19 @@ class SaleaeCsvTest extends AnyFlatSpec with should.Matchers {
     )
     val format: CSVLogicFormat[Delta, Channel] = SaleaeCsv.format(TimeParser.DeltaParser, channelMapping)
 
-    val bunk: ChannelSignals[Delta, Channel] = Foo.read(format)(csvReaderForResource("/saleae-export.csv"))
+    val original = Source.fromResource("saleae-export.csv").mkString
+    summarise(original)
 
-    val fields: Seq[String] =
-      TimeParser.DeltaParser.fieldName +: channelMapping.fieldsInPreferredOrder.map(_._1)
+    val signals = Foo.read(format)(CSVReader.open(Source.fromString(original)))
+
+    println(s"signals.interval=${signals.interval.mapBounds(TimeParser.DeltaParser.timeFormat.from)}")
+    println(s"signals.changeTimes.last=${signals.changeTimes.last}")
+
+    val fields: Seq[String] = TimeParser.DeltaParser.fieldName +: channelMapping.fieldsInPreferredOrder.map(_._1)
     val writer = new StringWriter()
-    val csvDetails = CSVDetails(CSVHeader(fields), format)
-    Foo.write(bunk, csvDetails)(CSVWriter.open(writer))
+    Foo.write(signals, CSVDetails(CSVHeader(fields), format))(CSVWriter.open(writer))
     val stuff = writer.toString
-    println(s"stuff=$stuff")
+    summarise(stuff)
   }
 
 }

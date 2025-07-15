@@ -11,7 +11,7 @@ object SaleaeCsv {
   ): CSVLogicFormat[T, Channel] = new CSVLogicFormat[T, Channel] {
 
     override def to = (signals: ChannelSignals[T, Channel]) =>
-      for (rowTime <- LazyList.from(signals.changeTimes)) yield {
+      for (rowTime <- LazyList.from(signals.changeAndBoundTimes)) yield {
         channelMapping.csvFieldsFor(signals.at(rowTime)) + (timeParser.fieldName -> timeParser.timeFormat.from(rowTime))
       }
 

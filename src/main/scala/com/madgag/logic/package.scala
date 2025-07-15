@@ -8,6 +8,11 @@ import spire.math.interval.{EmptyBound, Unbound, ValueBound}
 import java.util
 import scala.collection.Searching.*
 
+extension [A](ns: Interval[A])
+  def valueBounds: Set[A] = Set(ns.lowerBound, ns.upperBound).collect {
+    case vb: ValueBound[A] => vb.a
+  }
+
 enum SliceBound(isInclusive: Boolean):
   def stepFor(closedValueBound: Boolean): Int = if (closedValueBound != isInclusive) 1 else 0
   

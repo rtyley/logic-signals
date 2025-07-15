@@ -17,6 +17,8 @@ case class ChannelSignals[T : Time, C](data: Map[C, Signal[T]]) {
   
   lazy val changeTimes: SortedSet[T] = data.values.map(_.eventTimes()).reduce(_ ++ _)
   
+  lazy val changeAndBoundTimes: SortedSet[T] = changeTimes ++ interval.valueBounds
+  
   def at(time: T): Set[C] = data.filter(_._2.state(time)).keySet
   
   def chunksWhile(channel: C, value: Boolean): Iterable[ChannelSignals[T, C]] = for {

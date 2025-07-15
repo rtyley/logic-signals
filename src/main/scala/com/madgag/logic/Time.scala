@@ -2,6 +2,7 @@ package com.madgag.logic
 
 import cats.kernel.Order
 import spire.algebra.AdditiveMonoid
+import spire.math.interval.ValueBound
 import spire.math.{Bounded, Interval}
 
 import java.time.temporal.Temporal
@@ -24,7 +25,7 @@ trait TimeToOrderingConversion {
 
 object Time extends TimeToOrderingConversion {
   type Delta = Duration
-
+  
   extension [T: Time](ns: Interval[T])
     def duration: Duration = ns match {
       case b: Bounded[T] => summon[Time[T]].between(b.lower, b.upper)
