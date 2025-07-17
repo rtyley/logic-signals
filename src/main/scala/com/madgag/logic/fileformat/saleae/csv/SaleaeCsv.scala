@@ -1,9 +1,21 @@
 package com.madgag.logic.fileformat.saleae.csv
 
-import com.madgag.logic.fileformat.CSVLogicFormat
+import com.github.tototoshi.csv.{CSVFormat, DefaultCSVFormat}
+import com.madgag.logic.fileformat.{CSVDetails, CSVHeader, CSVLogicFormat}
 import com.madgag.logic.{ChannelMapping, ChannelSignals, Time, TimeParser}
 
 object SaleaeCsv {
+  val CsvFormat: CSVFormat = new DefaultCSVFormat {
+    override val lineTerminator: String = "\n"
+  }
+  
+  def csvDetails[T: Time, Channel](
+    timeParser: TimeParser[T],
+    channelMapping: ChannelMapping[Channel]
+  ): CSVDetails[T, Channel] = {
+    val fields: Seq[String] = TimeParser.DeltaParser.fieldName +: channelMapping.fieldsInPreferredOrder.map(_._1)
+    CSVDetails(CSVHeader(fields), format(timeParser, channelMapping))
+  }
 
   def format[T: Time, Channel](
     timeParser: TimeParser[T],
