@@ -1,4 +1,11 @@
+import ReleaseTransformations.*
+
+organization := "com.gu"
+licenses := Seq(License.Apache2)
+
 scalaVersion := "3.3.6"
+
+scalacOptions := Seq("-deprecation", "-release:11")
 
 Test / testOptions +=
   Tests.Argument(TestFrameworks.ScalaTest, "-u", s"test-results/scala-${scalaVersion.value}", "-o")
@@ -12,4 +19,16 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-core" % "2.13.0",
   "org.typelevel" %% "spire" % "0.18.0",
   "org.scalatest" %% "scalatest" % "3.2.19" % Test
+)
+
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  runTest,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  setNextVersion,
+  commitNextVersion
 )
