@@ -41,5 +41,6 @@ case class GusmanBConfig(
   captureChannels: Seq[CaptureChannel]
 ) derives ReadWriter {
   val sampleIntervalDuration: Duration = ofSeconds(1).dividedBy(frequency)
+  val postTriggerDuration: Duration = sampleIntervalDuration.multipliedBy(postTriggerSamples)
 }
 
