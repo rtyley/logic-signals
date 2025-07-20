@@ -19,6 +19,8 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-core" % "2.13.0",
   "org.typelevel" %% "spire" % "0.18.0",
   "com.gu" %% "logic-signals" % "1.0.0",
+  "com.lihaoyi" %% "upickle" % "4.2.1",
+  "com.lihaoyi" %% "os-lib" % "0.11.4",
   "org.scalatest" %% "scalatest" % "3.2.19" % Test
 )
 
