@@ -22,5 +22,5 @@ object Foo {
 
   def read[T: Time, C](format: CSVLogicFormat[T, C])(
     reader: CSVReader
-  ): ChannelSignals[T, C] = format.from(reader.toLazyListWithHeaders())
+  ): ChannelSignals[T, C] = format.from(reader.toLazyListWithHeaders().filter(_.values.exists(_.nonEmpty)))
 }
