@@ -1,12 +1,16 @@
 package com.madgag.logic.fileformat.gusmanb
 
 import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.CapitalisedPickle.ReadWriter
-import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.{CaptureChannel, TriggerType}
+import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.Trigger.TriggerType
+import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.{CaptureChannel, Trigger}
+import upickle.implicits.flatten
 
 import java.time.Duration
 import java.time.Duration.ofSeconds
 
 object GusmanBConfig {
+  def gusmanbChannel(gpioPin: Int): Int = gpioPin - (if (gpioPin <= 22) 2 else 5)
+  
   def read(readable: ujson.Readable, trace: Boolean = false): GusmanBConfig =
     CapitalisedPickle.read[GusmanBConfig](readable, trace)
 
@@ -23,10 +27,20 @@ object GusmanBConfig {
     channelName: String
   ) derives ReadWriter
 
-  enum TriggerType:
-    case Edge, Complex, Fast, Blast
+  case class Trigger (
+    triggerType: TriggerType,
+    triggerChannel: Int,
+    triggerInverted: Option[Boolean] = None,
+    triggerBitCount: Option[Int],
+    triggerPattern: Option[Int]
+  )
 
-  given ReadWriter[TriggerType] = CapitalisedPickle.readwriter[Int].bimap[TriggerType](_.ordinal, TriggerType.fromOrdinal)
+  object Trigger {
+    enum TriggerType:
+      case Edge, Complex, Fast, Blast
+
+    given ReadWriter[TriggerType] = CapitalisedPickle.readwriter[Int].bimap[TriggerType](_.ordinal, TriggerType.fromOrdinal)
+  }
 
   object CapitalisedPickle extends upickle.AttributeTagged {
     override def objectAttributeKeyWriteMap(s: CharSequence): String = s.toString.capitalize
@@ -44,13 +58,8 @@ case class GusmanBConfig(
   postTriggerSamples: Int,
   totalSamples: Int,
   captureChannels: Seq[CaptureChannel],
-  triggerType: TriggerType,
-  triggerChannel: Int,
-  triggerInverted: Boolean,
-  triggerBitCount: Int,
-  triggerPattern: Int
+  @flatten trigger: Trigger
 ) derives CapitalisedPickle.ReadWriter {
   val sampleIntervalDuration: Duration = ofSeconds(1).dividedBy(frequency)
   val postTriggerDuration: Duration = sampleIntervalDuration.multipliedBy(postTriggerSamples)
 }
-
