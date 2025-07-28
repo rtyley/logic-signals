@@ -31,8 +31,8 @@ object GusmanBConfig {
     triggerType: TriggerType,
     triggerChannel: Int,
     triggerInverted: Option[Boolean] = None,
-    triggerBitCount: Option[Int],
-    triggerPattern: Option[Int]
+    triggerBitCount: Option[Int] = None,
+    triggerPattern: Option[Int] = None
   )
 
   object Trigger {
