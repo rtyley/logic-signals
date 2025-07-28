@@ -1,7 +1,7 @@
 package com.madgag.logic.fileformat.gusmanb
 
-import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.CaptureChannel
-import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.CapitalisedPickle.*
+import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.CapitalisedPickle.ReadWriter
+import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.{CaptureChannel, TriggerType}
 
 import java.time.Duration
 import java.time.Duration.ofSeconds
@@ -23,6 +23,11 @@ object GusmanBConfig {
     channelName: String
   ) derives ReadWriter
 
+  enum TriggerType:
+    case Edge, Complex, Fast, Blast
+
+  given ReadWriter[TriggerType] = CapitalisedPickle.readwriter[Int].bimap[TriggerType](_.ordinal, TriggerType.fromOrdinal)
+
   object CapitalisedPickle extends upickle.AttributeTagged {
     override def objectAttributeKeyWriteMap(s: CharSequence): String = s.toString.capitalize
 
@@ -38,8 +43,13 @@ case class GusmanBConfig(
   preTriggerSamples: Int,
   postTriggerSamples: Int,
   totalSamples: Int,
-  captureChannels: Seq[CaptureChannel]
-) derives ReadWriter {
+  captureChannels: Seq[CaptureChannel],
+  triggerType: TriggerType,
+  triggerChannel: Int,
+  triggerInverted: Boolean,
+  triggerBitCount: Int,
+  triggerPattern: Int
+) derives CapitalisedPickle.ReadWriter {
   val sampleIntervalDuration: Duration = ofSeconds(1).dividedBy(frequency)
   val postTriggerDuration: Duration = sampleIntervalDuration.multipliedBy(postTriggerSamples)
 }
