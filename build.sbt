@@ -16,7 +16,7 @@ libraryDependencies ++= Seq(
   "com.github.tototoshi" %% "scala-csv" % "2.0.0",
   "com.lihaoyi" %% "fastparse" % "3.1.1",
   "org.scodec" %% "scodec-bits" % "1.2.4",
-  "org.scodec" %% "scodec-core" % "2.3.2",
+  "org.scodec" %% "scodec-core" % "2.3.3",
   "org.typelevel" %% "cats-core" % "2.13.0",
   "org.typelevel" %% "spire" % "0.18.0",
   "com.lihaoyi" %% "upickle" % "4.2.1",
