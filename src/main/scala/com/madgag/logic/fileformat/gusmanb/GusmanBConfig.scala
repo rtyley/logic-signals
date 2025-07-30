@@ -1,5 +1,6 @@
 package com.madgag.logic.fileformat.gusmanb
 
+import com.madgag.logic.GpioPin
 import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.CapitalisedPickle.ReadWriter
 import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.Trigger.TriggerType
 import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.{CaptureChannel, Trigger}
@@ -9,10 +10,13 @@ import java.time.Duration
 import java.time.Duration.ofSeconds
 
 object GusmanBConfig {
-  def gusmanbChannel(gpioPin: Int): Int = gpioPin - (if (gpioPin <= 22) 2 else 5)
+  def gusmanbChannel(gpioPin: GpioPin): Int = gpioPin.number - (if (gpioPin.number <= 22) 2 else 5)
   
   def read(readable: ujson.Readable, trace: Boolean = false): GusmanBConfig =
     CapitalisedPickle.read[GusmanBConfig](readable, trace)
+    
+  def write(gusmanBConfig: GusmanBConfig): String =
+    CapitalisedPickle.write[GusmanBConfig](gusmanBConfig)
 
   /**
    * https://github.com/gusmanb/logicanalyzer/blob/master/Software/LogicAnalyzer/SharedDriver/AnalyzerChannel.cs
