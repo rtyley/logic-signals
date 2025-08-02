@@ -11,6 +11,12 @@ import java.time.Duration.ofSeconds
 import scala.collection.immutable.{SortedMap, SortedSet}
 
 object GusmanBConfig {
+  /**
+   * https://github.com/gusmanb/logicanalyzer/blob/master/Software/LogicAnalyzer/SharedDriver/AnalyzerChannel.cs
+   * Surprisingly, this is zero-based, rather than one-based, so GPIO 2 is denoted by channelNumber=0, rather than
+   * channelNumber=1, despite the one-based channel numbering in this diagram:
+   * https://user-images.githubusercontent.com/4086913/221229250-51e03a76-2e01-48cc-a218-62fd21a8fbfb.png
+   */
   case class Channel(zeroBased: Int) extends Ordered[Channel] {
     val displayNumber: Int = zeroBased + 1
 
@@ -38,14 +44,6 @@ object GusmanBConfig {
   def write(gusmanBConfig: GusmanBConfig): String =
     CapitalisedPickle.write[GusmanBConfig](gusmanBConfig)
 
-  /**
-   * https://github.com/gusmanb/logicanalyzer/blob/master/Software/LogicAnalyzer/SharedDriver/AnalyzerChannel.cs
-   *
-   * @param channelNumber surprisingly, this is zero-based, rather than one-based, so GPIO 2 is denoted by
-   *                      channelNumber=0, rather than channelNumber=1, despite the one-based channel numbering in this
-   *                      diagram:
-   *                      https://user-images.githubusercontent.com/4086913/221229250-51e03a76-2e01-48cc-a218-62fd21a8fbfb.png
-   */
   case class CaptureChannel(
     channelNumber: Channel,
     channelName: String
