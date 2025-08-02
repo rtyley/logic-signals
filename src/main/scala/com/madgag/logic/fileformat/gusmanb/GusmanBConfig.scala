@@ -8,10 +8,30 @@ import upickle.implicits.flatten
 
 import java.time.Duration
 import java.time.Duration.ofSeconds
+import scala.collection.immutable.{SortedMap, SortedSet}
 
 object GusmanBConfig {
-  def gusmanbChannel(gpioPin: GpioPin): Int = gpioPin.number - (if (gpioPin.number <= 22) 2 else 5)
-  
+  case class Channel(zeroBased: Int) extends Ordered[Channel] {
+    val displayNumber: Int = zeroBased + 1
+
+    val displayText = s"CH $displayNumber" // as seen at https://github.com/gusmanb/logicanalyzer/wiki/02---LogicAnalyzer-Hardware
+
+    lazy val gpioPin: GpioPin = GpioPin(displayNumber + (if (displayNumber <= 22 ) 1 else 4))
+
+    override def compare(that: Channel): Int = zeroBased.compare(that.zeroBased)
+  }
+
+  object Channel {
+    val AllChannels: SortedSet[Channel] = SortedSet.from((0 to 27).map(Channel(_)))
+
+    val ChannelsByGpioPin: SortedMap[GpioPin, Channel] =
+      SortedMap.from(AllChannels.map(channel => channel.gpioPin -> channel))
+
+    val AllAvailableGpioPins: SortedSet[GpioPin] = ChannelsByGpioPin.keySet
+
+    given ReadWriter[Channel] = CapitalisedPickle.readwriter[Int].bimap[Channel](_.zeroBased, Channel(_))
+  }
+
   def read(readable: ujson.Readable, trace: Boolean = false): GusmanBConfig =
     CapitalisedPickle.read[GusmanBConfig](readable, trace)
     
@@ -27,13 +47,13 @@ object GusmanBConfig {
    *                      https://user-images.githubusercontent.com/4086913/221229250-51e03a76-2e01-48cc-a218-62fd21a8fbfb.png
    */
   case class CaptureChannel(
-    channelNumber: Int,
+    channelNumber: Channel,
     channelName: String
   ) derives ReadWriter
 
   case class Trigger (
     triggerType: TriggerType,
-    triggerChannel: Int,
+    triggerChannel: Channel,
     triggerInverted: Option[Boolean] = None,
     triggerBitCount: Option[Int] = None,
     triggerPattern: Option[Int] = None
