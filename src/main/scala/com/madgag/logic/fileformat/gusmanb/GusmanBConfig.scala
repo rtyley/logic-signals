@@ -28,7 +28,7 @@ object GusmanBConfig {
   }
 
   object Channel {
-    val AllChannels: SortedSet[Channel] = SortedSet.from((0 to 27).map(Channel(_)))
+    val AllChannels: SortedSet[Channel] = SortedSet.from((0 to 23).map(Channel(_)))
 
     val ChannelsByGpioPin: SortedMap[GpioPin, Channel] =
       SortedMap.from(AllChannels.map(channel => channel.gpioPin -> channel))

@@ -1,5 +1,6 @@
 package com.madgag.logic.fileformat.gusmanb
 
+import com.madgag.logic.GpioPin
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 
@@ -11,5 +12,17 @@ class GusmanBConfigTest extends AnyFlatSpec with should.Matchers {
     val config: GusmanBConfig = GusmanBConfig.read(os.read(os.resource / "ht-capture.tcs"))
     config.frequency shouldBe 100_000_000
     config.sampleIntervalDuration shouldBe ofNanos(10)
+  }
+
+  it should "have the right channels" in {
+    val channels = GusmanBConfig.Channel.AllChannels
+    channels.head.displayText shouldBe "CH 1"
+    channels.last.displayText shouldBe "CH 24"
+  }
+
+  it should "Fly" in {
+    val gpio = GusmanBConfig.Channel.AllAvailableGpioPins
+    gpio.head shouldBe GpioPin(2)
+    gpio.last shouldBe GpioPin(28)
   }
 }
