@@ -22,7 +22,7 @@ object GusmanBConfig {
 
     val displayText = s"CH $displayNumber" // as seen at https://github.com/gusmanb/logicanalyzer/wiki/02---LogicAnalyzer-Hardware
 
-    lazy val gpioPin: GpioPin = GpioPin(displayNumber + (if (displayNumber <= 22 ) 1 else 4))
+    lazy val gpioPin: GpioPin = GpioPin(displayNumber + (if (displayNumber <= 21 ) 1 else 4))
 
     override def compare(that: Channel): Int = zeroBased.compare(that.zeroBased)
   }
