@@ -2,12 +2,14 @@ package com.madgag.logic
 
 import com.madgag.logic.Time.*
 import com.madgag.scala.collection.decorators.*
+import monocle.{Focus, Traversal}
 import spire.*
 import spire.math.*
 import spire.math.interval.{Closed, Open}
 
 import scala.collection.immutable.{SortedMap, SortedSet}
 import scala.collection.mutable.ListBuffer
+import monocle.syntax.all.*
 
 case class ChannelSignals[T : Time, C](data: Map[C, Signal[T]]) {
 
@@ -46,6 +48,17 @@ case class ChannelSignals[T : Time, C](data: Map[C, Signal[T]]) {
   }
   
   def merge(other: ChannelSignals[T, C]): ChannelSignals[T, C] = copy(data = data ++ other.data)
+
+  lazy val summary: String = {
+    type Pair = (Signal[T], Set[C])
+    val booms: Seq[Pair] = data.groupUp(_._2)(_.keySet).toSeq.sortBy(_._2.size)
+    def boo(f: Set[C] => String)(sig: Signal[T], chans: Set[C]): String =
+      s"${f(chans)}: ${sig.summary}"
+
+    val (allButLast, last) = booms.splitAt(booms.length-1)
+    allButLast.map(boo(_.mkString(","))) ++ last.map(boo(x => if (x.size > 2) "*" else x.mkString(",")))
+    ""
+  }
 }
 
 object ChannelSignals {
@@ -57,6 +70,6 @@ object ChannelSignals {
       (channel, value) <- states
     } eventsByChannel.getOrElseUpdate(channel, new ListBuffer[Event[T, Boolean]]) += Event(time, value)
 
-    ChannelSignals(eventsByChannel.mapV(Signal(_)))
+    ChannelSignals(eventsByChannel.mapV(Signal.forIntervalImpliedBy(_)))
   }
 }

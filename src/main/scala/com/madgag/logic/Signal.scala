@@ -11,6 +11,10 @@ import java.time.Duration
 import scala.collection.Searching.*
 import scala.collection.immutable.SortedSet
 import scala.math.Ordering.Implicits.*
+import com.gu.time.duration.formatting.*
+
+import java.time.temporal.ChronoUnit
+import java.time.temporal.ChronoUnit.NANOS
 
 trait Signal[T: Time] {
   val interval: Interval[T]
@@ -30,11 +34,28 @@ trait Signal[T: Time] {
   def events(): Seq[Event[T, Boolean]]
   
   def eventTimes(): SortedSet[T]
+
+  def durations(): Seq[(Duration, Boolean)]
+
+  lazy val summary: String = durations().map {
+    case (duration: Duration, g: Boolean) =>
+      
+      
+      s"${if (g) "↗" else "↘"} ${duration.format(1, NANOS)}"
+  }.mkString(" ")
 }
 
 object Signal {
   private case class PunkSignal[T: Time](interval: Interval[T], initialState: Boolean, flipTimes: IndexedSeq[T]) extends Signal[T] {
-    assert(flipTimes.isEmpty || flipTimes.zip(flipTimes.tail).forall((a,b) => a < b))
+    require(flipTimes.forall(e => interval.contains(e)))
+    require(flipTimes.isEmpty || flipTimes.zip(flipTimes.tail).forall((a,b) => a < b))
+
+    //  1.2s ↘ 5.0s ↗ 1.2s ↘ 5.0s ↗ ⟍1ms⟋20ms
+    //
+    //  ‾⟍_1ms_⟋‾20ms‾⟍_1ms_⟋‾20ms‾⟍
+    //  ‾↘_1ms_↗‾20ms‾⟍_1ms_⟋‾20ms‾⟍
+    //  ◢1.2s◣1.5s◢1.2s◣
+    //  ↗️█1.0s█↘️ 2.0s ↗️█1.0s█↘️2.0s
 
     override val isConstant: Boolean = flipTimes.isEmpty
     
@@ -68,12 +89,21 @@ object Signal {
       }
 
     override def deglitch(threshold: Duration): PunkSignal[T] = PunkSignal(
-      interval, initialState, vorg(flipTimes) {
+      interval, initialState, accumulateWithPreviousOver(flipTimes) {
         case (acc, lastEvent, event) =>
           val glitch = Time.between(lastEvent, event) < threshold
           if (glitch) acc.dropRight(1) else acc :+ event
       }
     )
+
+    // the total durations should total to the interval duration, or what are we doing?
+    // the duration should be paired with the state during that duration
+    override def durations(): Seq[(Duration, Boolean)] = {
+      val boo = flipTimes :+ interval.upperBound.asInstanceOf[ValueBound[T]].a
+      for {
+        ((current, next), flipIndex) <- boo.zip(boo.drop(1)).zipWithIndex
+      } yield Time.between(current, next) -> stateFor(flipIndex)
+    }
 
     override def events(): Seq[Event[T, Boolean]] = for {
       (time, index) <- flipTimes.zipWithIndex
@@ -82,22 +112,27 @@ object Signal {
     override def eventTimes(): SortedSet[T] = SortedSet.from(flipTimes)
   }
 
-  private def vorg[X](items: Iterable[X])(boom: (Vector[X], X, X) => Vector[X]): IndexedSeq[X] = items.foldLeft(Vector.empty[X]) {
+  private def accumulateWithPreviousOver[X](items: Iterable[X])(boom: (Vector[X], X, X) => Vector[X]): IndexedSeq[X] = items.foldLeft(Vector.empty[X]) {
     case (acc, item) => acc.lastOption match {
       case Some(previousItem) => boom(acc, previousItem, item)
       case None => Vector(item)
     }
   }
 
-  def apply[T: Time](events: Iterable[Event[T, Boolean]]): Signal[T] = {
-    val flipEvents = vorg(events) {
+  def apply[T: Time](interval: Interval[T], events: Iterable[Event[T, Boolean]]): Signal[T] = {
+    require(events.forall(e => interval.contains(e.time)))
+    val flipEvents = accumulateWithPreviousOver(events) {
       case (acc, lastEvent, event) => if (event.value == lastEvent.value) acc else acc :+ event
     }
     PunkSignal(
-      Interval(events.head.time, events.last.time),
+      interval,
+      //Interval(events.head.time, events.last.time),
       !events.head.value,
       flipEvents.map(_.time)
     )
   }
+  
+  def forIntervalImpliedBy[T: Time](events: Iterable[Event[T, Boolean]]): Signal[T] = 
+    Signal(Interval(events.head.time, events.last.time), events)
 }
 

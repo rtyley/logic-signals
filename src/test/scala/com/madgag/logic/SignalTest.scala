@@ -18,7 +18,7 @@ class SignalTest extends AnyFlatSpec with should.Matchers {
     (x, timeMs) <- timeline.zipWithIndex if x != '.'
   } yield Event(ofMillis(timeMs), x == '1')
 
-  def convert(timeline: String): Signal[Delta] = Signal(eventsFor(timeline))
+  def convert(timeline: String): Signal[Delta] = Signal.forIntervalImpliedBy(eventsFor(timeline))
 
   def convert(signal: Signal[Delta], len: Int): String = {
     val events = signal.events()
@@ -30,7 +30,7 @@ class SignalTest extends AnyFlatSpec with should.Matchers {
 
   def checkSignalEvents(input: String): Unit = {
     val events = eventsFor(input)
-    val signal = Signal(events)
+    val signal = Signal.forIntervalImpliedBy(events)
     signal.events() shouldBe events
   }
 
@@ -61,7 +61,8 @@ class SignalTest extends AnyFlatSpec with should.Matchers {
   )
 
   "Signal.state" should "be correct" in {
-    val signal = signalFor("█▁▁▁▁▁▁▁▁▁▁▁")
+    val signal = signalFor("█▁▁")
+    signal.interval.duration shouldBe ofMillis(3)
     signal.state(ofMillis(0)) shouldBe true
     signal.state(ofMillis(1)) shouldBe false
     signal.state(ofMillis(2)) shouldBe false
@@ -69,13 +70,27 @@ class SignalTest extends AnyFlatSpec with should.Matchers {
 
   "Signal.intervalsWhile" should "be correct" in {
     signalFor("█▁▁").intervalsWhile(false) shouldBe Seq(
-      fromBounds(Closed(ofMillis(1)), Closed(ofMillis(2)))
+      Interval.openUpper(ofMillis(1), ofMillis(3))
     )
 
     signalFor("█▁▁").intervalsWhile(true) shouldBe Seq(fromBounds(Closed(ofMillis(0)), Open(ofMillis(1))))
-
   }
 
+  "Signal.durations" should "be correct" in {
+    val sig = signalFor("█▁▁")
+    sig.interval.duration shouldBe ofMillis(3)
+    sig.durations() shouldBe Seq(
+      ofMillis(1) -> true,
+      ofMillis(2) -> false
+    )
+    sig.durations().map(_._1).reduce(_ plus _) shouldBe ofMillis(3)
+  }
+
+  "Signal.summary" should "be correct" in {
+    val sig = signalFor("█▁▁")
+    sig.summary shouldBe "↗ 1ms ↘ 2ms"
+  }
+  
   it should "split a signal interval into parts that completely cover the interval without overlapping" in {
     val originalSignal = signalFor("█▁▁█▁██")
     println(originalSignal.interval)

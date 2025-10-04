@@ -12,6 +12,9 @@ Test / testOptions +=
   Tests.Argument(TestFrameworks.ScalaTest, "-u", s"test-results/scala-${scalaVersion.value}", "-o")
 
 libraryDependencies ++= Seq(
+  "com.gu.duration-formatting" %% "core" % "0.0.1-SNAPSHOT",
+  "dev.optics" %% "monocle-core"  % "3.3.0",
+  "dev.optics" %% "monocle-macro" % "3.3.0",
   "com.madgag" %% "scala-collection-plus" % "1.0.0",
   "com.github.tototoshi" %% "scala-csv" % "2.0.0",
   "com.lihaoyi" %% "fastparse" % "3.1.1",
@@ -19,7 +22,7 @@ libraryDependencies ++= Seq(
   "org.scodec" %% "scodec-core" % "2.3.3",
   "org.typelevel" %% "cats-core" % "2.13.0",
   "org.typelevel" %% "spire" % "0.18.0",
-  "com.lihaoyi" %% "upickle" % "4.2.1",
+  "com.lihaoyi" %% "upickle" % "4.3.2",
   "com.lihaoyi" %% "os-lib" % "0.11.5",
   "org.scalatest" %% "scalatest" % "3.2.19" % Test
 )

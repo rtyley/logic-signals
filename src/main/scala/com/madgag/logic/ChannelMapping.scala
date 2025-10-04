@@ -25,6 +25,6 @@ case class ChannelMapping[C](fieldsInPreferredOrder: (String, C)*) {
   } yield channel -> d.map(_.map(_.contains(channel)))).toMap
 
   def signals[T: Time](d: Iterable[Event[T, Set[C]]]): ChannelSignals[T, C] = 
-    ChannelSignals(groupByChannel(d).mapV(foo => Signal(foo)))
+    ChannelSignals(groupByChannel(d).mapV(foo => Signal.forIntervalImpliedBy(foo)))
   
 }
