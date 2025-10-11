@@ -51,10 +51,10 @@ object GusmanBConfig {
 
   case class Trigger (
     triggerType: TriggerType,
-    triggerChannel: Int,
+    triggerChannel: Channel, // triggerChannel is independent of whatever is being captured
     triggerInverted: Option[Boolean] = None,
     triggerBitCount: Option[Int] = None,
-    triggerPattern: Option[Int] = None
+    triggerPattern: Option[Int] = None // triggerPattern is on consecutive channels, based on triggerChannel onwards
   )
 
   object Trigger {
