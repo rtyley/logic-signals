@@ -56,8 +56,7 @@ case class ChannelSignals[T : Time, C](data: Map[C, Signal[T]]) {
       s"${f(chans)}: ${sig.summary}"
 
     val (allButLast, last) = booms.splitAt(booms.length-1)
-    allButLast.map(boo(_.mkString(","))) ++ last.map(boo(x => if (x.size > 2) "*" else x.mkString(",")))
-    ""
+    (allButLast.map(boo(_.mkString(","))) ++ last.map(boo(x => if (x.size > 2) "*" else x.mkString(",")))).mkString("\n")
   }
 }
 
