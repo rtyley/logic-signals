@@ -2,8 +2,10 @@ package com.madgag.logic.fileformat.gusmanb
 
 import com.madgag.logic.GpioPin
 import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.CapitalisedPickle.ReadWriter
+import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.Channel.AllChannels
 import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.Trigger.TriggerType
 import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.{CaptureChannel, Trigger}
+import scodec.bits.BitVector
 import upickle.implicits.flatten
 
 import java.time.Duration
@@ -24,11 +26,15 @@ object GusmanBConfig {
 
     lazy val gpioPin: GpioPin = GpioPin(displayNumber + (if (displayNumber <= 21 ) 1 else 4))
 
+    def offsetBy(offset: Int): Option[Channel] = AllChannels.find(_.zeroBased == zeroBased + offset)
+
     override def compare(that: Channel): Int = zeroBased.compare(that.zeroBased)
   }
 
   object Channel {
     val AllChannels: SortedSet[Channel] = SortedSet.from((0 to 23).map(Channel(_)))
+
+    def withDisplayNumber(displayNumber: Int): Option[Channel] = AllChannels.find(_.displayNumber == displayNumber)
 
     val ChannelsByGpioPin: SortedMap[GpioPin, Channel] =
       SortedMap.from(AllChannels.map(channel => channel.gpioPin -> channel))
@@ -55,12 +61,28 @@ object GusmanBConfig {
     triggerInverted: Option[Boolean] = None,
     triggerBitCount: Option[Int] = None,
     triggerPattern: Option[Int] = None // triggerPattern is on consecutive channels, based on triggerChannel onwards
-  )
+  ) {
+    lazy val finalChannelOfPattern: Option[Channel] = triggerBitCount.flatMap(triggerChannel.offsetBy)
+
+    require(triggerType.highestPermittedChannelWithinPattern.forall(_ >= finalChannelOfPattern.get))
+  }
 
   object Trigger {
-    enum TriggerType:
-      case Edge, Complex, Fast, Blast
+    enum TriggerType(val highestPermittedChannelWithinPattern: Option[Channel] = None):
+      case Edge extends TriggerType()
+      case Complex extends TriggerType(highestPermittedChannelWithinPattern = Channel.withDisplayNumber(16))
+      case Fast extends TriggerType(highestPermittedChannelWithinPattern = Channel.withDisplayNumber(5))
+      case Blast extends TriggerType() // https://github.com/gusmanb/logicanalyzer/issues/218#issuecomment-2723117313
 
+    object TriggerType:
+      def optimalTypeFor(highestChannelWithinPattern: Channel): Option[TriggerType] =
+        Seq(Fast, Complex).find(_.highestPermittedChannelWithinPattern.forall(_ >= highestChannelWithinPattern))
+
+    def withOptimalTypeForPattern(bits: BitVector, baseChannel: Channel): Option[Trigger] = for {
+      highestChannelWithinPattern <- baseChannel.offsetBy(bits.length.toInt)
+      typ <- TriggerType.optimalTypeFor(highestChannelWithinPattern)
+    } yield Trigger(typ, baseChannel, triggerBitCount = bits.intSize, triggerPattern = Some(bits.toInt(signed = false)))
+    
     given ReadWriter[TriggerType] = CapitalisedPickle.readwriter[Int].bimap[TriggerType](_.ordinal, TriggerType.fromOrdinal)
   }
 
