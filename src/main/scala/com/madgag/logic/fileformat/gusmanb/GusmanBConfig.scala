@@ -51,7 +51,7 @@ object GusmanBConfig {
 
   case class Trigger (
     triggerType: TriggerType,
-    triggerChannel: Channel,
+    triggerChannel: Int,
     triggerInverted: Option[Boolean] = None,
     triggerBitCount: Option[Int] = None,
     triggerPattern: Option[Int] = None
