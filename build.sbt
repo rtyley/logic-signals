@@ -12,7 +12,7 @@ Test / testOptions +=
   Tests.Argument(TestFrameworks.ScalaTest, "-u", s"test-results/scala-${scalaVersion.value}", "-o")
 
 libraryDependencies ++= Seq(
-  "com.gu.duration-formatting" %% "core" % "0.0.1-SNAPSHOT",
+  "com.gu.duration-formatting" %% "core" % "0.0.2",
   "dev.optics" %% "monocle-core"  % "3.3.0",
   "dev.optics" %% "monocle-macro" % "3.3.0",
   "com.madgag" %% "scala-collection-plus" % "1.0.0",
