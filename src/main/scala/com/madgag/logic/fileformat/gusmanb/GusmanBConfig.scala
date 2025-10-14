@@ -1,11 +1,13 @@
 package com.madgag.logic.fileformat.gusmanb
 
+import cats.data.NonEmptySet
 import cats.kernel.Order
 import com.madgag.logic.GpioPin
 import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.CapitalisedPickle.ReadWriter
 import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.Channel.{AllChannels, CH_16, CH_5}
 import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.Trigger.TriggerType
-import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.{CaptureChannel, Trigger}
+import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.{CaptureChannel, Channel, Trigger}
+import GusmanBConfig.*
 import scodec.bits.BitVector
 import upickle.implicits.flatten
 
@@ -114,6 +116,24 @@ case class GusmanBConfig(
   captureChannels: Seq[CaptureChannel],
   @flatten trigger: Trigger
 ) derives CapitalisedPickle.ReadWriter {
+  val channels: NonEmptySet[Channel] = NonEmptySet.fromSetUnsafe(SortedSet.from(captureChannels.map(_.channelNumber)))
+  
   val sampleIntervalDuration: Duration = ofSeconds(1).dividedBy(frequency)
   val postTriggerDuration: Duration = sampleIntervalDuration.multipliedBy(postTriggerSamples)
+  val captureMode: CaptureMode = CaptureMode.forChannels(channels)
+  
+  def issueWithBoard(board: BoardDef): Option[SamplingIssue] = SamplingIssue.of(board, channels, totalSamples)
+}
+case class SamplingIssue(maxSamples: Int, requestedSamples: Int, captureMode: CaptureMode) {
+  val summary: String = s"$captureMode only permits $maxSamples - requested $requestedSamples"
+}
+
+object SamplingIssue {
+  def of(boardDef: BoardDef, channels: NonEmptySet[Channel], requestedSamples: Int): Option[SamplingIssue] = {
+    val captureMode = CaptureMode.forChannels(channels)
+    val maxSamples = boardDef.maxSamplesFor(captureMode)
+    Option.when(requestedSamples > maxSamples)(SamplingIssue(
+      maxSamples, requestedSamples, captureMode
+    ))
+  }
 }
