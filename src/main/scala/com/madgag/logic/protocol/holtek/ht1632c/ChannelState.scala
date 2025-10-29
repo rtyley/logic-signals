@@ -10,13 +10,13 @@ import scala.jdk.CollectionConverters.*
 
 sealed trait Channel
 object Channel {
-  object Data extends Channel
+  case object Data extends Channel
 
   sealed trait Clock(val rw: ReadOrWrite) extends Channel
 
   object Clock {
-    object Read extends Clock(ReadOrWrite.Read)
-    object Write extends Clock(ReadOrWrite.Write)
+    case object Read extends Clock(ReadOrWrite.Read)
+    case object Write extends Clock(ReadOrWrite.Write)
   }
 
   sealed trait ChipSelect extends Channel {
