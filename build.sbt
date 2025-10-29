@@ -1,12 +1,12 @@
 import ReleaseTransformations.*
 import sbtversionpolicy.withsbtrelease.ReleaseVersion
 
-organization := "com.gu"
+organization := "com.madgag"
 licenses := Seq(License.Apache2)
 
 scalaVersion := "3.3.6"
 
-scalacOptions := Seq("-deprecation", "-release:11")
+scalacOptions := Seq("-deprecation", "-release:21")
 
 Test / testOptions +=
   Tests.Argument(TestFrameworks.ScalaTest, "-u", s"test-results/scala-${scalaVersion.value}", "-o")
@@ -22,12 +22,12 @@ libraryDependencies ++= Seq(
   "org.scodec" %% "scodec-core" % "2.3.3",
   "org.typelevel" %% "cats-core" % "2.13.0",
   "org.typelevel" %% "spire" % "0.18.0",
-  "com.lihaoyi" %% "upickle" % "4.3.2",
-  "com.lihaoyi" %% "os-lib" % "0.11.5",
+  "com.lihaoyi" %% "upickle" % "4.4.0",
+  "com.lihaoyi" %% "os-lib" % "0.11.6",
   "org.scalatest" %% "scalatest" % "3.2.19" % Test
 )
 
-releaseVersion := ReleaseVersion.fromAssessedCompatibilityWithLatestRelease().value
+// releaseVersion := ReleaseVersion.fromAssessedCompatibilityWithLatestRelease().value
 releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
   inquireVersions,
