@@ -11,18 +11,17 @@ import spire.math.interval.ValueBound
 
 import scala.collection.immutable.SortedMap
 
-case class OperationSignals[T: Time](rwSignals: Map[Clock, Signal[T]], data: Signal[T]) {
+case class OperationSignals[T: Time](readWriteClocks: Map[Clock, Signal[T]], data: Signal[T]) {
 
-  val interval: Interval[T] = (rwSignals.values.toSeq :+ data).map(_.interval).reduce(_ | _)
+  val interval: Interval[T] = (readWriteClocks.values.toSeq :+ data).map(_.interval).reduce(_ | _)
   val startTime: T = interval.lowerBound.asInstanceOf[ValueBound[T]].a
   
   lazy val mixedBits: Seq[RWBit] = (for {
-    (clock, clockSignal) <- rwSignals
-  } yield clockSignal.goingTo(true).map(time => time -> RWBit(data.state(time), clock.rw))
-  ).reduce(_ ++ _).toSeq.sortBy(_._1).map(_._2)
+    (clock, clockSignal) <- readWriteClocks
+    time <- clockSignal.goingTo(true)
+  } yield time -> clock.rw.bit(data.state(time))).toSeq.sortBy(_._1).map(_._2)
 
   lazy val operation: Option[Operation] = summon[Parser[Operation]].parse(mixedBits).map(_._1)
-  lazy val writeModeOpt: Option[WriteMode] = operation.collect { case w: WriteMode => w }
 
   lazy val opOrBadBits: Either[String, Operation] = operation.toRight(mixedBits.map(_.symbol).mkString)
 }

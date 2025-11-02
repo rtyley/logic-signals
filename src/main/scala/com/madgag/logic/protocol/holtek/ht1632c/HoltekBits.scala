@@ -20,15 +20,15 @@ object HoltekBits {
 //  def loadGusman(name: String, rowDuration: Duration, channelMapping: ChannelMapping[Channel]): ChannelSignals[Duration, Channel] =
 //    GusmanBCaptureCSV.parse(rowsForResource(name), rowDuration, channelMapping)
 
-  def operationSignalsFor[T: Time](channelSignals: ChannelSignals[T, Channel], chipSelect: ChipSelect): Iterable[OperationSignals[T]] = {
-
-    for {
-      chunk <- channelSignals.chunksWhile(chipSelect, false) if !chunk.isConstant
-    } yield {
-      val clockSignals = chunk.data.collect { case (c: Clock, s) => c -> s }
-      OperationSignals(clockSignals, chunk.data(Channel.Data))
-    }
-  }
+  def operationSignalsFor[T: Time](
+    channelSignals: ChannelSignals[T, Channel],
+    chipSelect: ChipSelect
+  ): Iterable[OperationSignals[T]] = for {
+    chunk <- channelSignals.chunksWhile(chipSelect, false) if !chunk.isConstant
+  } yield OperationSignals(
+    readWriteClocks = chunk.data.collect { case (c: Clock, s) => c -> s },
+    data = chunk.data(Channel.Data)
+  )
 
   def operationsFor[T: Time](channelSignals: ChannelSignals[T, Channel]): Map[ChipSelect, SortedMap[T, Operation]] = {
     // println(s"Got channelSignals: $channelSignals")
