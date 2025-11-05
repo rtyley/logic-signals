@@ -80,13 +80,19 @@ object Signal {
       }.filter(!_.isEmpty).toSeq
     }
 
-    override def subInterval(sub: Interval[T]): Signal[T] =
-      val effectiveInterval = sub.intersect(sub)
-      effectiveInterval.lowerBound match {
-        case ValueBound(a) =>
-          PunkSignal(effectiveInterval, state(a), flipTimes.subInterval(Interval.fromBounds(Open(a), sub.upperBound)))
-        case _ => PunkSignal(effectiveInterval, initialState, flipTimes.subInterval(sub))
+    override def subInterval(sub: Interval[T]): Signal[T] = {
+      val effectiveInterval = interval.intersect(sub)
+      if (effectiveInterval.isEmpty) PunkSignal(effectiveInterval, false, IndexedSeq.empty) else {
+        val everythingUpToButExcludingTheLowerBound =
+          (~Interval.fromBounds(effectiveInterval.lowerBound, Unbound())).head
+
+        PunkSignal(
+          effectiveInterval,
+          initialState ^ (flipTimes.subInterval(everythingUpToButExcludingTheLowerBound).size % 2 == 1),
+          flipTimes.subInterval(effectiveInterval)
+        )
       }
+    }
 
     override def deglitch(threshold: Duration): PunkSignal[T] = PunkSignal(
       interval, initialState, accumulateWithPreviousOver(flipTimes) {
@@ -105,8 +111,8 @@ object Signal {
       } yield Time.between(current, next) -> stateFor(flipIndex)
     }
 
-    override def events(): Seq[Event[T, Boolean]] = for {
-      (time, index) <- flipTimes.zipWithIndex
+    override def events(): LazyList[Event[T, Boolean]] = for {
+      (time, index) <- LazyList.from(flipTimes).zipWithIndex
     } yield Event(time, stateFor(index))
     
     override def eventTimes(): SortedSet[T] = SortedSet.from(flipTimes)

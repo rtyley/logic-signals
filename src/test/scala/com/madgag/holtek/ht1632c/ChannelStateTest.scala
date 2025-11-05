@@ -1,24 +1,22 @@
 package com.madgag.holtek.ht1632c
 
+import com.madgag.logic.*
+import com.madgag.logic.Time.*
+import com.madgag.logic.protocol.holtek.ht1632c.Channel.{ChipSelect, Clock, Data}
 import com.madgag.logic.protocol.holtek.ht1632c.HoltekBits.{operationSignalsFor, operationsFor}
-import com.madgag.logic.protocol.holtek.ht1632c.signals.ReadOrWrite.Write
-import com.madgag.logic.Time.Delta
-import com.madgag.logic.{ChannelMapping, ChannelSignals, Signal, TestKit, TimeParser}
+import com.madgag.logic.protocol.holtek.ht1632c.operations.DataOperation.WriteMode
+import com.madgag.logic.protocol.holtek.ht1632c.operations.{DataOperation, Operation, OperationSignals}
+import com.madgag.logic.protocol.holtek.ht1632c.{Channel, ChipLed, HoltekBits}
+import com.madgag.scala.collection.decorators.*
 import org.scalatest.OptionValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import spire.math.interval.ValueBound
-import com.madgag.logic.Time.*
-import com.madgag.logic.protocol.holtek.ht1632c.Channel.{ChipSelect, Clock, Data}
-import com.madgag.logic.protocol.holtek.ht1632c.{Channel, ChipLed, HoltekBits}
-import com.madgag.logic.protocol.holtek.ht1632c.operations.{Operation, OperationSignals, WriteMode}
-
-import java.time.Duration.{ofMillis, ofNanos}
-import scala.collection.immutable.SortedMap
-import com.madgag.scala.collection.decorators.*
 
 import java.time.Duration
+import java.time.Duration.{ofMillis, ofNanos}
 import java.time.temporal.ChronoUnit
+import scala.collection.immutable.SortedMap
 import scala.math.Ordering.Implicits.*
 
 class ChannelStateTest extends AnyFlatSpec with should.Matchers with OptionValues {

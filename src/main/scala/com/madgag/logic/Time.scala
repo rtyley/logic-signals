@@ -25,6 +25,9 @@ trait TimeToOrderingConversion {
 
 object Time extends TimeToOrderingConversion {
   type Delta = Duration
+
+  extension [T: Time](t: T)
+    def add(duration: Duration): T = summon[Time[T]].add(t, duration)
   
   extension [T: Time](ns: Interval[T])
     def duration: Duration = ns match {
