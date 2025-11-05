@@ -8,6 +8,7 @@ import com.madgag.logic.fileformat.Record.csvReaderForResource
 import com.madgag.logic.fileformat.saleae.csv.SaleaeCsv
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.{ChipSelect, Clock}
 import com.madgag.logic.protocol.holtek.ht1632c.operations.*
+import com.madgag.logic.protocol.holtek.ht1632c.operations.DataOperation.WriteMode
 import com.madgag.logic.{ChannelMapping, ChannelSignals, Time, TimeParser}
 
 import scala.collection.immutable.SortedMap
@@ -29,6 +30,11 @@ object HoltekBits {
     readWriteClocks = chunk.data.collect { case (c: Clock, s) => c -> s },
     data = chunk.data(Channel.Data)
   )
+
+  def opsFor[T: Time](channelSignals: ChannelSignals[T, Channel]): Seq[(ChipSelect, OperationSignals[T])] = for {
+    chipSelectChannel <- channelSignals.data.keys.toSeq.collect { case cs: ChipSelect => cs }
+    opSignal <- operationSignalsFor(channelSignals, chipSelectChannel)
+  } yield chipSelectChannel -> opSignal
 
   def operationsFor[T: Time](channelSignals: ChannelSignals[T, Channel]): Map[ChipSelect, SortedMap[T, Operation]] = {
     // println(s"Got channelSignals: $channelSignals")

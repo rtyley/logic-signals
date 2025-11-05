@@ -2,14 +2,12 @@ package com.madgag.logic
 
 import com.madgag.logic.Time.*
 import com.madgag.scala.collection.decorators.*
-import monocle.{Focus, Traversal}
 import spire.*
 import spire.math.*
 import spire.math.interval.{Closed, Open}
 
 import scala.collection.immutable.{SortedMap, SortedSet}
 import scala.collection.mutable.ListBuffer
-import monocle.syntax.all.*
 
 case class ChannelSignals[T : Time, C](data: Map[C, Signal[T]]) {
 

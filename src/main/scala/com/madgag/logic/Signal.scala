@@ -85,7 +85,7 @@ object Signal {
       effectiveInterval.lowerBound match {
         case ValueBound(a) =>
           PunkSignal(effectiveInterval, state(a), flipTimes.subInterval(Interval.fromBounds(Open(a), sub.upperBound)))
-        case _ => PunkSignal(effectiveInterval, initialState, flipTimes.subInterval(sub))
+        case _ => PunkSignal(effectiveInterval, initialState, flipTimes.subInterval(sub)) // TODO this feels like it's probably wrong?
       }
 
     override def deglitch(threshold: Duration): PunkSignal[T] = PunkSignal(
@@ -105,8 +105,8 @@ object Signal {
       } yield Time.between(current, next) -> stateFor(flipIndex)
     }
 
-    override def events(): Seq[Event[T, Boolean]] = for {
-      (time, index) <- flipTimes.zipWithIndex
+    override def events(): LazyList[Event[T, Boolean]] = for {
+      (time, index) <- LazyList.from(flipTimes).zipWithIndex
     } yield Event(time, stateFor(index))
     
     override def eventTimes(): SortedSet[T] = SortedSet.from(flipTimes)
