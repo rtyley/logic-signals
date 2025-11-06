@@ -1,16 +1,15 @@
 package com.madgag.logic
 
 import com.madgag.logic.TestKit.signalFor
-import com.madgag.logic.Time.Delta
+import com.madgag.logic.Time.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import spire.math.Interval
-import spire.math.Interval.fromBounds
-import spire.math.interval.{Closed, Open, Unbound}
+import spire.math.Interval.{fromBounds, openUpper}
+import spire.math.interval.{Closed, Open}
 
 import java.time.Duration
 import java.time.Duration.ofMillis
-import Time.*
 
 class SignalTest extends AnyFlatSpec with should.Matchers {
 
@@ -70,7 +69,7 @@ class SignalTest extends AnyFlatSpec with should.Matchers {
 
   "Signal.intervalsWhile" should "be correct" in {
     signalFor("█▁▁").intervalsWhile(false) shouldBe Seq(
-      Interval.openUpper(ofMillis(1), ofMillis(3))
+      openUpper(ofMillis(1), ofMillis(3))
     )
 
     signalFor("█▁▁").intervalsWhile(true) shouldBe Seq(fromBounds(Closed(ofMillis(0)), Open(ofMillis(1))))
@@ -107,4 +106,16 @@ class SignalTest extends AnyFlatSpec with should.Matchers {
     }
   }
 
+  it should "be able to extract subintervals" in {
+    val originalSignal = signalFor("█▁▁█▁██")
+    println(originalSignal.interval)
+
+    val interval = openUpper(ofMillis(3), ofMillis(6))
+    signalFor("▁▁▁█▁█▁").subInterval(interval) shouldBe originalSignal.subInterval(interval)
+  }
+
+  it should "recognise that we can extend the interval when we do subintervals" in {
+    val interval = openUpper(ofMillis(-3), ofMillis(2))
+    signalFor("█▁▁▁▁▁▁").subInterval(interval) shouldBe signalFor("█▁")
+  }
 }

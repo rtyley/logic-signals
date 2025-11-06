@@ -20,6 +20,10 @@ enum SliceBound(isInclusive: Boolean):
   case UpperExclusive extends SliceBound(false) // Found, exclusive, closed implies must increment
 
 extension [T: Ordering](ns: IndexedSeq[T])
+  /**
+   * Returns a sub-sequence of this sequence, optimised on the assumption that
+   * the sequence is sorted in ascending order.
+   */
   def subInterval(i: Interval[T]): IndexedSeq[T] = {
     def where(x: ValueBound[T], sliceBound: SliceBound): Int = ns.search(x.a) match {
       case Found(foundIndex) => foundIndex + sliceBound.stepFor(x.isClosed)
