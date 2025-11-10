@@ -1,16 +1,23 @@
 package com.madgag.logic
 
 import com.madgag.logic.SliceBound.{LowerInclusive, UpperExclusive}
-import scodec.bits.BitVector
 import spire.math.Interval
-import spire.math.interval.{EmptyBound, Unbound, ValueBound}
+import spire.math.interval.{Closed, EmptyBound, Unbound, ValueBound}
 
-import java.util
 import scala.collection.Searching.*
 
 extension [A](ns: Interval[A])
   def valueBounds: Set[A] = Set(ns.lowerBound, ns.upperBound).collect {
     case vb: ValueBound[A] => vb.a
+  }
+
+  def closedBounds: Set[A] = Set(ns.lowerBound, ns.upperBound).collect {
+    case vb: Closed[A] => vb.a
+  }
+
+  def toBoundedIntervalOpt: Option[BoundedInterval[A]] = ns match {
+    case bi: BoundedInterval[A] => Some(bi)
+    case _ => None
   }
 
 enum SliceBound(isInclusive: Boolean):
