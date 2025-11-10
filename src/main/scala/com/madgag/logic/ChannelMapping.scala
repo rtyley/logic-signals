@@ -1,5 +1,6 @@
 package com.madgag.logic
 
+import com.madgag.logic.Time.*
 import com.madgag.scala.collection.decorators.*
 
 case class ChannelMapping[C](fieldsInPreferredOrder: (String, C)*) {
@@ -24,7 +25,15 @@ case class ChannelMapping[C](fieldsInPreferredOrder: (String, C)*) {
     channel <- channels
   } yield channel -> d.map(_.map(_.contains(channel)))).toMap
 
-  def signals[T: Time](d: Iterable[Event[T, Set[C]]]): ChannelSignals[T, C] = 
-    ChannelSignals(groupByChannel(d).mapV(foo => Signal.forIntervalImpliedBy(foo)))
-  
+  /**
+   * We receive a bunch of rows, most of them transitions, but the first and last are just the state of
+   * the system at the start and end times - they are not a _change_, or event, just state at that point of time.
+   * 
+   * This means we will be getting rows that are *not* flipTimes for most of the channels.
+   */
+  def signals[T: Time](d: Iterable[Event[T, Set[C]]]): ChannelSignals[T, C] = {
+    val interval = BoundedInterval.closed(d.head.time, d.last.time)
+    ChannelSignals(groupByChannel(d).mapV(foo => Signal(interval, foo)))
+  }
+
 }
