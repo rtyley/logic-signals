@@ -1,10 +1,10 @@
 package com.madgag.logic.fileformat.vcd
 
-import com.madgag.logic.Time.Delta
-import ValueChangeDump.DataSection.{ValueChange, dataSection}
-import ValueChangeDump.Header.{TimeScale, header}
-import ValueChangeDump.{DataSection, Header}
 import com.madgag.logic.ChannelSignals
+import com.madgag.logic.Time.Delta
+import com.madgag.logic.fileformat.vcd.ValueChangeDump.DataSection.{ValueChange, dataSection}
+import com.madgag.logic.fileformat.vcd.ValueChangeDump.Header.{TimeScale, header}
+import com.madgag.logic.fileformat.vcd.ValueChangeDump.{DataSection, Header}
 
 import java.time.Duration
 import java.time.temporal.ChronoUnit

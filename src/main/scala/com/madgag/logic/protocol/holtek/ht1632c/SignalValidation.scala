@@ -1,10 +1,10 @@
 package com.madgag.logic.protocol.holtek.ht1632c
 
 import cats.data.ValidatedNec
-import com.madgag.logic.{ChannelSignals, Event, Time}
 import com.madgag.logic.Time.{add, orderForTime}
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.{ChipSelect, Clock, Data}
 import com.madgag.logic.protocol.holtek.ht1632c.operations.DataOperation.{ReadMode, WriteMode}
+import com.madgag.logic.{ChannelSignals, Event, Time}
 import spire.math.Interval
 import spire.math.Interval.{atOrAbove, atOrBelow}
 

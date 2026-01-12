@@ -2,19 +2,18 @@ package com.madgag.logic
 
 import cats.kernel.Order
 import cats.kernel.Order.*
+import com.gu.time.duration.formatting.*
 import com.madgag.logic.*
 import com.madgag.logic.Time.*
 import spire.math.Interval
 import spire.math.interval.{Closed, Open, Unbound, ValueBound}
 
 import java.time.Duration
+import java.time.temporal.ChronoUnit
+import java.time.temporal.ChronoUnit.NANOS
 import scala.collection.Searching.*
 import scala.collection.immutable.SortedSet
 import scala.math.Ordering.Implicits.*
-import com.gu.time.duration.formatting.*
-
-import java.time.temporal.ChronoUnit
-import java.time.temporal.ChronoUnit.NANOS
 
 trait Signal[T: Time] {
   val interval: Interval[T]

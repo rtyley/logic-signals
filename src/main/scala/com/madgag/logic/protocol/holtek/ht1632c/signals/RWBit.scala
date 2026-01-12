@@ -1,6 +1,6 @@
 package com.madgag.logic.protocol.holtek.ht1632c.signals
 
-import ReadOrWrite.*
+import com.madgag.logic.protocol.holtek.ht1632c.signals.ReadOrWrite.*
 
 case class RWBit(value: Boolean, rw: ReadOrWrite, symbol: String)
 

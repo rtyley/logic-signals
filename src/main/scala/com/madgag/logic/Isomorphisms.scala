@@ -1,9 +1,9 @@
 package com.madgag.logic
 
+import cats.*
 import cats.arrow.Arrow
-import cats._
-import cats.data._
-import cats.syntax.all._
+import cats.data.*
+import cats.syntax.all.*
 
 /**
  * https://eed3si9n.com/herding-cats/Isomorphism.html#Isomorphism

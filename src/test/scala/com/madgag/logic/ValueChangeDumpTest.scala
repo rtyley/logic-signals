@@ -1,14 +1,14 @@
 package com.madgag.logic
 
+import com.madgag.logic.Time.Delta
+import com.madgag.logic.fileformat.vcd.ValueChangeDump
+import com.madgag.logic.fileformat.vcd.ValueChangeDump.Header
+import com.madgag.logic.fileformat.vcd.ValueChangeDump.Header.{Scope, TimeScale, VarDef}
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.ChipSelect.{Follower, Leader}
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.Clock.Write
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.Data
-import com.madgag.logic.Time.Delta
-import com.madgag.logic.fileformat.vcd.ValueChangeDump
-import com.madgag.logic.protocol.holtek.ht1632c.{Channel, HoltekBits}
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Operation
-import ValueChangeDump.Header
-import ValueChangeDump.Header.{Scope, TimeScale, VarDef}
+import com.madgag.logic.protocol.holtek.ht1632c.{Channel, HoltekBits}
 import fastparse.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should

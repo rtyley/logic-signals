@@ -1,8 +1,8 @@
 package com.madgag.logic.protocol.holtek.ht1632c
 
-import com.madgag.logic.{ChannelSignals, Time}
 import com.madgag.logic.TestKit.signalFor
 import com.madgag.logic.protocol.holtek.ht1632c.SignalValidation.validate
+import com.madgag.logic.{ChannelSignals, Time}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 

@@ -1,18 +1,17 @@
 package com.madgag.logic.protocol.holtek.ht1632c.operations
 
-import com.madgag.logic.protocol.holtek.ht1632c.signals.MixedBits.Parser
-import com.madgag.logic.protocol.holtek.ht1632c.signals.ReadOrWrite.{Read, Write}
 import com.madgag.logic.BitEndian.{BigFirst, LittleFirst}
 import com.madgag.logic.protocol.holtek.ht1632c.LedAddress
 import com.madgag.logic.protocol.holtek.ht1632c.operations.DataOperation.MemoryAddress
+import com.madgag.logic.protocol.holtek.ht1632c.signals.MixedBits.Parser
+import com.madgag.logic.protocol.holtek.ht1632c.signals.ReadOrWrite.{Read, Write}
 import com.madgag.logic.protocol.holtek.ht1632c.signals.{MixedBits, ReadOrWrite}
+import com.madgag.scala.collection.decorators.*
 import scodec.*
 import scodec.bits.*
 
-import scala.collection.mutable.ListBuffer
-import com.madgag.scala.collection.decorators.*
-
 import scala.annotation.tailrec
+import scala.collection.mutable.ListBuffer
 
 sealed trait Operation
 

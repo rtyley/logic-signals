@@ -1,12 +1,11 @@
 package com.madgag.logic
 
-import com.madgag.logic.Time.Delta
-
-import java.time.Duration.ofMillis
-import com.madgag.scala.collection.decorators.*
 import com.madgag.logic.Time.*
+import com.madgag.scala.collection.decorators.*
 import org.scalatest.matchers.should.Matchers.shouldBe
 import spire.math.Interval
+
+import java.time.Duration.ofMillis
 
 object TestKit {
   val High: Set[Char] = Set('1', '█')

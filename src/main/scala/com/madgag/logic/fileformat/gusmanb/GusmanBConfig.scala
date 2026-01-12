@@ -3,11 +3,10 @@ package com.madgag.logic.fileformat.gusmanb
 import cats.data.NonEmptySet
 import cats.kernel.Order
 import com.madgag.logic.GpioPin
+import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.*
 import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.CapitalisedPickle.ReadWriter
 import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.Channel.{AllChannels, CH_16, CH_5}
 import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.Trigger.TriggerType
-import com.madgag.logic.fileformat.gusmanb.GusmanBConfig.{CaptureChannel, Channel, Trigger}
-import GusmanBConfig.*
 import scodec.bits.BitVector
 import upickle.implicits.flatten
 
