@@ -22,12 +22,12 @@ object SaleaeCsv {
     channelMapping: ChannelMapping[Channel]
   ): CSVLogicFormat[T, Channel] = new CSVLogicFormat[T, Channel] {
 
-    override def to = (signals: ChannelSignals[T, Channel]) =>
+    override def to: ChannelSignals[T, Channel] => LazyList[Map[String, String]] = signals =>
       for (rowTime <- LazyList.from(signals.changeAndBoundTimes)) yield {
         channelMapping.csvFieldsFor(signals.at(rowTime)) + (timeParser.fieldName -> timeParser.timeFormat.from(rowTime))
       }
 
-    override def from = (rows: LazyList[Map[String, String]]) =>
+    override def from: LazyList[Map[String, String]] => ChannelSignals[T, Channel] = rows =>
       channelMapping.signals(rows.map(row => channelMapping.parse(row, timeParser)))
   }
 }

@@ -1,50 +1,11 @@
 package com.madgag.logic.protocol.holtek.ht1632c
 
-import com.madgag.logic.Time
-import com.madgag.logic.Time.orderForTime
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.*
-import com.madgag.logic.protocol.holtek.ht1632c.CriteriaSubject.Trigger
 import com.madgag.logic.protocol.holtek.ht1632c.signals.ReadOrWrite
-import spire.math.Interval
-import spire.math.Interval.{atOrAbove, atOrBelow}
+import com.madgag.logic.signals.triggers.ChannelGroup
 
-import scala.concurrent.duration.FiniteDuration
-import scala.jdk.DurationConverters.*
-
-trait CriteriaSubject[C] {
-  val change = CriteriaSubject.Trigger(this, Set(false, true))
-  val rising = CriteriaSubject.Trigger(this, Set(true))
-  val falling = CriteriaSubject.Trigger(this, Set(false))
-
-  val pulse: (Trigger[C], Trigger[C]) = change -> change
-  val positivePulse: (Trigger[C], Trigger[C]) = rising -> falling
-
-  val appliesTo: C => Boolean
-}
-
-case class Criterion[C](startAndEnd: (Trigger[C], Trigger[C]), timing: Timing) {
-  val (start, end) = startAndEnd
-}
-
-object CriteriaSubject {
-  case class Trigger[C](subject: CriteriaSubject[C], goingTo: Set[Boolean]) {
-    def appliesTo(c: C): Boolean = subject.appliesTo(c)
-
-    def triggeredByValueOf(e: com.madgag.logic.Event[_, Boolean]): Boolean = goingTo.contains(e.value)
-  }
-
-  extension [C] (fromTo: (Trigger[C], Trigger[C]))
-    def has(timing: Timing) = Criterion(fromTo, timing)
-
-    def takes(min: FiniteDuration) = Criterion(fromTo, Timing(atOrAbove(min.toJava)))
-    def takes(min: FiniteDuration, typical: FiniteDuration) =
-      Criterion(fromTo, Timing(atOrAbove(min.toJava), Some(typical.toJava)))
-    def takesAtMost(max: FiniteDuration, typical: FiniteDuration) =
-      Criterion(fromTo, Timing(atOrBelow(max.toJava), Some(typical.toJava)))
-}
-
-sealed trait Channel extends CriteriaSubject[Channel] {
-  override val appliesTo: Channel => Boolean = _ == this
+sealed trait Channel extends ChannelGroup[Channel] {
+  override def includes[C1 >: Channel](channel: C1): Boolean = channel == this
 }
 
 object Channel {
@@ -52,18 +13,18 @@ object Channel {
 
   sealed trait Clock(val rw: ReadOrWrite) extends Channel
 
-  case object Clock extends CriteriaSubject {
+  case object Clock extends ChannelGroup[Channel] {
     case object Read extends Clock(ReadOrWrite.Read)
     case object Write extends Clock(ReadOrWrite.Write)
 
-    override val appliesTo: Channel => Boolean = _.isInstanceOf[Clock]
+    override def includes[C1 >: Channel](channel: C1): Boolean = channel.isInstanceOf[Clock]
   }
 
   sealed trait ChipSelect extends Channel {
     val index: Int
   }
-  case object ChipSelect extends CriteriaSubject {
-    override val appliesTo: Channel => Boolean = _.isInstanceOf[ChipSelect]
+  case object ChipSelect extends ChannelGroup[Channel] {
+    override def includes[C1 >: Channel](channel: C1): Boolean = channel.isInstanceOf[ChipSelect]
 
     given Ordering[ChipSelect] = Ordering.by(_.index)
     
@@ -82,12 +43,4 @@ object Channel {
 object ChannelState {
 
   val timeField = "Time [s]"
-//
-//  def time[T](block: => T): T = {
-//    val before = System.nanoTime
-//    val result = block
-//    val after = System.nanoTime
-//    println("Elapsed time: " + (after - before) / 1000000 + "ms")
-//    result
-//  }
 }

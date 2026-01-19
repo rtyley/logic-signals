@@ -1,7 +1,6 @@
 package com.madgag.logic.protocol.holtek.ht1632c
 
 import cats.kernel.Order.*
-import com.github.tototoshi.csv.CSVReader
 import com.madgag.logic.Time.*
 import com.madgag.logic.fileformat.Foo
 import com.madgag.logic.fileformat.Record.csvReaderForResource
@@ -9,17 +8,24 @@ import com.madgag.logic.fileformat.saleae.csv.SaleaeCsv
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.{ChipSelect, Clock}
 import com.madgag.logic.protocol.holtek.ht1632c.operations.*
 import com.madgag.logic.protocol.holtek.ht1632c.operations.DataOperation.WriteMode
+import com.madgag.logic.protocol.holtek.ht1632c.signals.TimingCharacteristics
 import com.madgag.logic.{ChannelMapping, ChannelSignals, Time, TimeParser}
 
+import java.time.Duration.ofNanos
 import scala.collection.immutable.SortedMap
 
 object HoltekBits {
 
-  def loadResource[T: Time](name: String, timeParser: TimeParser[T], channelMapping: ChannelMapping[Channel]): ChannelSignals[T, Channel] =
-    Foo.read(SaleaeCsv.format(timeParser, channelMapping))(csvReaderForResource(name))
+  def loadResource[T: Time](name: String, timeParser: TimeParser[T], channelMapping: ChannelMapping[Channel]): ChannelSignals[T, Channel] = {
 
-//  def loadGusman(name: String, rowDuration: Duration, channelMapping: ChannelMapping[Channel]): ChannelSignals[Duration, Channel] =
-//    GusmanBCaptureCSV.parse(rowsForResource(name), rowDuration, channelMapping)
+    val channelSignals = Foo.read(SaleaeCsv.format(timeParser, channelMapping))(csvReaderForResource(name))
+    val anomaliesByCriterion = TimingCharacteristics.violationFinder.violationsIn(channelSignals.transform(_.deglitch(ofNanos(90))))
+    println(anomaliesByCriterion.map {
+      case (key, value) => key.name + ":\n\t" + value.toSeq.take(3).map(_.summary).mkString(", ")
+    }.mkString("\n"))
+    require(anomaliesByCriterion.isEmpty)
+    channelSignals
+  }
 
   def operationSignalsFor[T: Time](
     channelSignals: ChannelSignals[T, Channel],
