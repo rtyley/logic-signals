@@ -8,7 +8,7 @@ import com.madgag.logic.BoundedInterval.*
 import com.madgag.logic.Direction.{Asc, Desc}
 import com.madgag.logic.Signal.ChangeType
 import com.madgag.logic.Time.*
-import com.madgag.logic.signals.selectors.PairSelector
+import com.madgag.logic.signals.selectors.{IntervalSelector, PairSelector}
 import com.madgag.logic.signals.triggers.ChannelGroup
 import com.madgag.logic.signals.triggers.Criterion.Trigger.Bound.IntervalToBound
 import com.madgag.logic.signals.triggers.Criterion.Trigger.MatchAttributes
@@ -106,6 +106,17 @@ object Criterion {
 
     val summary = s"$channelGroup${change.char}"
   }
+
+  given [C]: Conversion[(Trigger[C], Trigger[C]), IntervalSelector[C]] with
+    def apply(fromTo: (Trigger[C], Trigger[C])): IntervalSelector[C] = new IntervalSelector[C] {
+      val (from, to) = fromTo
+      
+      def selectIn[T: Time, C1 >: C](signals: ChannelSignals[T, C1]): Iterable[ChannelSignals[T, C1]] = for {
+        fromEvent <- from.occurrencesIn(signals)
+        signalsOnwards = signals.unsafeSubInterval(atOrAbove(fromEvent.time))
+        toEvent <- to.occurrencesIn(signalsOnwards)
+      } yield signals.unsafeSubInterval(Interval.closed(fromEvent.time, toEvent.time))
+    }
 
   extension [C](fromTo: (Trigger[C], Trigger[C]))
     def has(constraint: TimingConstraint): ViolationFinder[C] = new ViolationFinder[C] {

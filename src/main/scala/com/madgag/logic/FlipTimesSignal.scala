@@ -60,6 +60,8 @@ protected case class FlipTimesSignal[T: Time](
    *
    * Convention: If the flip time is at the lower (closed) bound of the interval, then 'initialState' is actually the opposite
    * of what the initial interval will denote.
+   *
+   * Should this thing be able to return intervals that are Point???!!!
    */
   override def intervals(): Iterable[(BoundedInterval[T], Boolean)] = {
     val flipTimesExcludingLowerBound = if (firstFlipCoincidentWithLowerBound) flipTimes.tail else flipTimes

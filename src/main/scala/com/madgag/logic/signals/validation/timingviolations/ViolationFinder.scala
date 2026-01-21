@@ -3,7 +3,7 @@ package com.madgag.logic.signals.validation.timingviolations
 import cats.*
 import cats.data.*
 import cats.syntax.all.*
-import com.madgag.logic.signals.selectors.PulseSelector
+import com.madgag.logic.signals.selectors.{IntervalSelector, PulseSelector}
 import com.madgag.logic.signals.triggers.ChannelGroup
 import com.madgag.logic.signals.triggers.Criterion.Timing
 import com.madgag.logic.signals.validation.SignalValidation.TransitionPair
@@ -26,10 +26,10 @@ trait ViolationFinder[C] {
 
 object ViolationFinder {
 
-  def within[C](pulseSelector: PulseSelector[C])(finders: ViolationFinder[C]*): ViolationFinder[C] = new ViolationFinder[C] {
+  def within[C](intervalSelector: IntervalSelector[C])(finders: ViolationFinder[C]*): ViolationFinder[C] = new ViolationFinder[C] {
     override def violationsIn[T: Time](signals: ChannelSignals[T, C]): Violations[T, C] = Monoid.combineAll {
       for {
-        pulseSignals <- pulseSelector.selectIn(signals)
+        pulseSignals <- intervalSelector.selectIn(signals)
         finder <- finders
       } yield finder.violationsIn(pulseSignals)
     }

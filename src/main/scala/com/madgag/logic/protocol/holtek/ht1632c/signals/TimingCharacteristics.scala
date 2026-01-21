@@ -35,10 +35,12 @@ object TimingCharacteristics {
       negativePulse(
         Start -> first(Clock.falling) takes("tsu1", min = 200.nanos, typical = 300.nanos),
         last(Clock.rising) -> End takes("th1", min = 100.nanos, typical = 200.nanos),
-        dataSetupAndHoldAroundClock,
-        tod,
-        within(Clock.Read.pulse)(Start -> End takes("tCLK_Read", min = 1000.nanos)),
-        within(Clock.Write.pulse)(Start -> End takes("tCLK_Write", min = 500.nanos)),
+        within(first(Clock.falling) -> last(Clock.rising))(
+          within(Clock.Read.pulse)(Start -> End takes("tCLK_Read", min = 1000.nanos)),
+          within(Clock.Write.pulse)(Start -> End takes("tCLK_Write", min = 500.nanos)),
+          dataSetupAndHoldAroundClock,
+          tod,
+        )
       )
     )
 }
