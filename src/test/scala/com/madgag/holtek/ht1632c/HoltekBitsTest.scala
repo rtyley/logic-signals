@@ -5,30 +5,47 @@ import com.madgag.logic.Time.*
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.{ChipSelect, Clock, Data}
 import com.madgag.logic.protocol.holtek.ht1632c.HoltekBits.operationSignalsFor
 import com.madgag.logic.protocol.holtek.ht1632c.operations.DataOperation.WriteMode
-import com.madgag.logic.protocol.holtek.ht1632c.operations.Operation
+import com.madgag.logic.protocol.holtek.ht1632c.operations.{Command, CommandMode, Operation}
 import com.madgag.logic.protocol.holtek.ht1632c.{Channel, ChipLed, HoltekBits}
 import com.madgag.scala.collection.decorators.*
 import org.scalatest.OptionValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
+import scodec.bits.bin
 import spire.math.interval.ValueBound
 
+import java.time.Duration
 import java.time.Duration.ofMillis
 import scala.collection.immutable.SortedMap
 import scala.math.Ordering.Implicits.*
 
 class HoltekBitsTest extends AnyFlatSpec with should.Matchers with OptionValues {
-
-  val starts101ChannelMapping = ChannelMapping[Channel](
-    "What dat" -> ChipSelect.Leader,
-    "Chip Select" -> ChipSelect.Follower.One,
+  val ginClockChannelMapping = ChannelMapping[Channel](
+    "CS Leader" -> ChipSelect.Leader,
+    "CS Follower" -> ChipSelect.Follower.One,
     "Write" -> Clock.Write,
     "Data" -> Data
   )
 
   "Holtek 101 Write" should "be a thing" in {
-    val boom = HoltekBits.loadResource("/digital.starts-101.csv", TimeParser.DeltaParser, starts101ChannelMapping)
-    operationSignalsFor(boom, ChipSelect.Follower.One).head.operation.value shouldBe a[WriteMode]
+    val boom =
+      HoltekBits.loadResource("/gin-clock.large-sample.saleae-export.csv",
+        TimeParser.DeltaParser,
+        ginClockChannelMapping,
+        deglitchTime = Duration.ofNanos(2000) // Seen a legit gin clock pulse length 3840 nanos
+      )
+    val followerOpSignals = operationSignalsFor(boom, ChipSelect.Follower.One)
+    val operations = followerOpSignals.map(_.operation.value)
+    followerOpSignals.head.operation.value shouldBe a[CommandMode]
+    operations.take(7) shouldBe Seq(
+      CommandMode(Command(bin"000000000")),
+      CommandMode(Command(bin"001011000")),
+      CommandMode(Command(bin"000110000")),
+      CommandMode(Command(bin"000000010")),
+      CommandMode(Command(bin"101011110")),
+      CommandMode(Command(bin"000010000")),
+      CommandMode(Command(bin"000000100")),
+    )
   }
 
 //  "Pico cap" should "finally read like ascending integers" in {

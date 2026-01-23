@@ -11,20 +11,23 @@ import com.madgag.logic.protocol.holtek.ht1632c.operations.DataOperation.WriteMo
 import com.madgag.logic.protocol.holtek.ht1632c.signals.TimingCharacteristics
 import com.madgag.logic.{ChannelMapping, ChannelSignals, Time, TimeParser}
 
+import java.time.Duration
 import java.time.Duration.ofNanos
 import scala.collection.immutable.SortedMap
 
 object HoltekBits {
 
-  def loadResource[T: Time](name: String, timeParser: TimeParser[T], channelMapping: ChannelMapping[Channel]): ChannelSignals[T, Channel] = {
-
-    val channelSignals = Foo.read(SaleaeCsv.format(timeParser, channelMapping))(csvReaderForResource(name))
-    val anomaliesByCriterion = TimingCharacteristics.violationFinder.violationsIn(channelSignals.transform(_.deglitch(ofNanos(90))))
+  def loadResource[T: Time](name: String, timeParser: TimeParser[T], channelMapping: ChannelMapping[Channel], deglitchTime: Duration): ChannelSignals[T, Channel] = {
+    val deglitchedSignals = {
+      val channelSignals = Foo.read(SaleaeCsv.format(timeParser, channelMapping))(csvReaderForResource(name))
+      channelSignals.transform(_.deglitch(deglitchTime))
+    }
+    val anomaliesByCriterion = TimingCharacteristics.violationFinder.violationsIn(deglitchedSignals)
     println(anomaliesByCriterion.map {
       case (key, value) => key.name + ":\n\t" + value.toSeq.take(3).map(_.summary).mkString(", ")
     }.mkString("\n"))
     require(anomaliesByCriterion.isEmpty)
-    channelSignals
+    deglitchedSignals
   }
 
   def operationSignalsFor[T: Time](
