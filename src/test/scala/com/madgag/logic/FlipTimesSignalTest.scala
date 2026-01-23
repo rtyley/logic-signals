@@ -7,6 +7,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import org.scalatest.{Inspectors, OptionValues}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import spire.math.Interval
 import spire.math.Interval.{atOrAbove, below}
 
 import java.time.Duration
@@ -113,11 +114,23 @@ class FlipTimesSignalTest extends AnyFlatSpec with should.Matchers with ScalaChe
   it should "work for lots" in forAll { (signal: FlipTimesSignal[Delta]) =>
     println(signal.summary)
     val intervals = signal.intervals()
+    Inspectors.forAll(intervals) {
+      case (interval, state) =>
+        interval ⊆ signal.interval shouldBe true
+    }
+
+    intervals.map(_._1).foldLeft(List[Interval[Delta]](signal.interval)) {
+      case (remainingSignalIntervals, subInterval) => remainingSignalIntervals.flatMap(_ -- subInterval)
+    } shouldBe empty
+
     intervals.map(_._1.duration).reduce(_ plus _) shouldBe signal.interval.duration
     Inspectors.forAll(intervals.zip(intervals.tail)) {
       case ((interval, state), (nextInterval, nextState)) =>
         nextState shouldBe !state
         interval.overlap(nextInterval).isDisjoint shouldBe true
+        val commonBound = nextInterval.lowerValueBound.a
+        interval.upperValueBound.a shouldBe commonBound
+        interval.contains(commonBound) || nextInterval.contains(commonBound) shouldBe true
     }
 
     val eventsInAscendingDirection = signal.events(Direction.Asc)

@@ -117,6 +117,8 @@ object DataOperation {
 }
 
 case class Command(value: BitVector) {
+  require(value.size == 9)
+  
   override val toString: String = {
     val b = value.toBin
     s"${b.take(4)}-${b.substring(4,8)}-X"
@@ -141,8 +143,8 @@ object Command {
   val SlaveMode = SimpleCode("0001-0XXX-X")
 }
 
-case class CommandMode(commands: Seq[Command]) extends Operation
+case class CommandMode(commands: Command*) extends Operation
 object CommandMode {
-  given MixedBits.Parser[CommandMode] = Parser.rep[Command].map(CommandMode(_))
+  given MixedBits.Parser[CommandMode] = Parser.rep[Command].map(CommandMode(_*))
 }
 

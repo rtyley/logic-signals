@@ -26,7 +26,7 @@ case class OperationSignals[T: Time](readWriteClocks: Map[Clock, Signal[T]], dat
 
   /**
    * Only one operation can occur per Chip-Select reset - in the Holtek 1632C docs, this is made clearest
-   * in the diagram labelled "Mode - Data and Command Mode", but in text the docs do say:
+   * in the diagram labelled "Mode - Data and Command Mode", but in text the docs do back this up, saying:
    *
    * ''While the system is operating in the non-successive command or the non-successive address data mode,
    * the CS pin should be set to "1" and the previous operation mode will be reset also. Once the CS
