@@ -4,14 +4,18 @@ import com.madgag.logic.*
 import com.madgag.logic.Time.*
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.{ChipSelect, Clock, Data}
 import com.madgag.logic.protocol.holtek.ht1632c.HoltekBits.operationSignalsFor
-import com.madgag.logic.protocol.holtek.ht1632c.operations.DataOperation.WriteMode
+import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.COM.DisplayLayout.`32x8`
+import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.COM.OpenDrain.NMOS
+import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.SyncRole.RCLeader
+import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.Setting.OffOn.{Off, On}
+import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.Setting.Switchable.{Blink, LedDutyCycleGenerator, SystemOscillator}
+import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.{COM, PWM}
 import com.madgag.logic.protocol.holtek.ht1632c.operations.{Command, CommandMode, Operation}
 import com.madgag.logic.protocol.holtek.ht1632c.{Channel, ChipLed, HoltekBits}
 import com.madgag.scala.collection.decorators.*
 import org.scalatest.OptionValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
-import scodec.bits.bin
 import spire.math.interval.ValueBound
 
 import java.time.Duration
@@ -37,16 +41,21 @@ class HoltekBitsTest extends AnyFlatSpec with should.Matchers with OptionValues 
     val followerOpSignals = operationSignalsFor(boom, ChipSelect.Follower.One)
     val operations = followerOpSignals.map(_.operation.value)
     followerOpSignals.head.operation.value shouldBe a[CommandMode]
+
+    val commands = operations.take(7).flatMap(_.asInstanceOf[CommandMode].commands)
+
     operations.take(7) shouldBe Seq(
-      CommandMode(Command(bin"000000000")),
-      CommandMode(Command(bin"001011000")),
-      CommandMode(Command(bin"000110000")),
-      CommandMode(Command(bin"000000010")),
-      CommandMode(Command(bin"101011110")),
-      CommandMode(Command(bin"000010000")),
-      CommandMode(Command(bin"000000100")),
-    )
+      SystemOscillator(Off),
+      COM(NMOS,`32x8`),
+      RCLeader,
+      SystemOscillator(On),
+      PWM(16),
+      Blink(Off),
+      LedDutyCycleGenerator(Off)
+    ).map(CommandMode(_))
   }
+
+
 
 //  "Pico cap" should "finally read like ascending integers" in {
 //    val channelMapping = ChannelMapping[Channel](

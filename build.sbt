@@ -26,7 +26,7 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "spire" % spireVersion,
   "org.typelevel" %% "spire-laws" % spireVersion % Test,
   "com.lihaoyi" %% "upickle" % "4.4.2",
-  "com.lihaoyi" %% "os-lib" % "0.11.6",
+  "com.lihaoyi" %% "os-lib" % "0.11.8",
   "org.scalatest" %% "scalatest" % "3.2.19" % Test,
   "org.scalatestplus" %% "scalacheck-1-18" % "3.2.19.0" % Test
 )
