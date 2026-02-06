@@ -7,7 +7,6 @@ import com.madgag.logic.protocol.holtek.ht1632c.signals.MixedBits.Parser
 import com.madgag.logic.protocol.holtek.ht1632c.signals.ReadOrWrite.{Read, Write}
 import com.madgag.logic.protocol.holtek.ht1632c.signals.{MixedBits, ReadOrWrite}
 import com.madgag.scala.collection.decorators.*
-import scodec.*
 import scodec.bits.*
 
 import scala.annotation.tailrec
@@ -114,33 +113,6 @@ object DataOperation {
       values <- Parser.rep[Access]
     } yield WriteMode(memoryAddress, values)
   }
-}
-
-case class Command(value: BitVector) {
-  require(value.size == 9)
-  
-  override val toString: String = {
-    val b = value.toBin
-    s"${b.take(4)}-${b.substring(4,8)}-X"
-  }
-}
-
-object Command {
-  given MixedBits.Parser[Command] = Parser.extract(9, BigFirst, Write).map(Command(_))
-
-  trait Code {
-    def matches(bitVector: BitVector): Boolean
-  }
-
-  case class SimpleCode(pattern: String) extends Code {
-    val barePattern = pattern.replace("-", "")
-    val mask = BitVector.bits(barePattern.map(_ == 'X'))
-    val bits = BitVector.bits(barePattern.map(_ == '1'))
-
-    override def matches(bitVector: BitVector): Boolean = (bitVector & mask) == bits
-  }
-
-  val SlaveMode = SimpleCode("0001-0XXX-X")
 }
 
 case class CommandMode(commands: Command*) extends Operation
