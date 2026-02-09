@@ -7,12 +7,13 @@ import com.madgag.logic.*
 import com.madgag.logic.BoundedInterval.*
 import com.madgag.logic.Direction.{Asc, Desc}
 import com.madgag.logic.Signal.ChangeType
-import com.madgag.logic.Time.*
 import com.madgag.logic.signals.selectors.{IntervalSelector, PairSelector}
 import com.madgag.logic.signals.triggers.ChannelGroup
 import com.madgag.logic.signals.triggers.Criterion.Trigger.Bound.IntervalToBound
 import com.madgag.logic.signals.triggers.Criterion.Trigger.MatchAttributes
 import com.madgag.logic.signals.validation.timingviolations.{TimingConstraint, ViolationFinder, Violations}
+import com.madgag.logic.time.Time
+import com.madgag.logic.time.Time.*
 import spire.math.Interval
 import spire.math.Interval.{atOrAbove, atOrBelow}
 import spire.math.interval.ValueBound

@@ -1,7 +1,7 @@
 package com.madgag.logic
 
 import com.madgag.logic.BoundedInterval.*
-import com.madgag.logic.Time.*
+import com.madgag.logic.time.Time.*
 import org.scalacheck.Arbitrary
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should

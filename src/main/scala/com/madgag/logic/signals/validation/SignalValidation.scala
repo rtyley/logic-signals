@@ -2,8 +2,9 @@ package com.madgag.logic.signals.validation
 
 import cats.data.ValidatedNec
 import com.gu.time.duration.formatting.*
+import com.madgag.logic.Event
 import com.madgag.logic.signals.triggers.Criterion.Trigger.MatchAttributes
-import com.madgag.logic.{Event, Time}
+import com.madgag.logic.time.Time
 
 import java.time.Duration
 

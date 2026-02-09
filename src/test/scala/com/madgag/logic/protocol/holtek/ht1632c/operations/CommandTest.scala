@@ -2,9 +2,9 @@ package com.madgag.logic.protocol.holtek.ht1632c.operations
 
 import com.madgag.logic.bits.Nibble
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.*
-import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.SyncRole.*
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.Setting.OffOn.On
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.Setting.Switchable.LedDutyCycleGenerator
+import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.SyncRole.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import scodec.bits.bin

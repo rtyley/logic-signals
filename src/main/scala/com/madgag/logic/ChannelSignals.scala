@@ -3,10 +3,11 @@ package com.madgag.logic
 import com.madgag.algo.sorting.kwaymerge.Merge.mergeIterable
 import com.madgag.logic.BoundedInterval.*
 import com.madgag.logic.ChannelSignals.groupAdjacent
-import com.madgag.logic.Time.*
 import com.madgag.logic.signals.triggers.ChannelGroup
 import com.madgag.logic.signals.triggers.Criterion.SignalChange
 import com.madgag.logic.signals.triggers.Criterion.Trigger.MatchingChannels
+import com.madgag.logic.time.Time
+import com.madgag.logic.time.Time.*
 import com.madgag.scala.collection.decorators.*
 import spire.math.*
 import spire.math.interval.{Closed, Open}

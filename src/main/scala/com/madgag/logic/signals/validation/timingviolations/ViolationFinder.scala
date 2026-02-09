@@ -3,11 +3,12 @@ package com.madgag.logic.signals.validation.timingviolations
 import cats.*
 import cats.data.*
 import cats.syntax.all.*
+import com.madgag.logic.ChannelSignals
 import com.madgag.logic.signals.selectors.{IntervalSelector, PulseSelector}
 import com.madgag.logic.signals.triggers.ChannelGroup
 import com.madgag.logic.signals.triggers.Criterion.Timing
 import com.madgag.logic.signals.validation.SignalValidation.TransitionPair
-import com.madgag.logic.{ChannelSignals, Time}
+import com.madgag.logic.time.Time
 
 case class TimingConstraint(name: String, timing: Timing)
 

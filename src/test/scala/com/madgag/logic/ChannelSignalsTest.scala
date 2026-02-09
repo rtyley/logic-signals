@@ -1,9 +1,9 @@
 package com.madgag.logic
 
 import com.madgag.logic.TestKit.CharDuration
-import com.madgag.logic.Time.Delta
 import com.madgag.logic.protocol.holtek.ht1632c.Channel
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.{ChipSelect, Clock}
+import com.madgag.logic.time.Time.Delta
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 

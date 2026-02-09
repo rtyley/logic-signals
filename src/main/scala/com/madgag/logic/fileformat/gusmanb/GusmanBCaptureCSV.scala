@@ -1,9 +1,10 @@
 package com.madgag.logic.fileformat.gusmanb
 
 import com.madgag.logic.Direction.Asc
-import com.madgag.logic.Time.{*, given}
 import com.madgag.logic.fileformat.{CSVDetails, CSVHeader, CSVLogicFormat}
-import com.madgag.logic.{ChannelMapping, ChannelSignals, Event, Time}
+import com.madgag.logic.time.Time
+import com.madgag.logic.time.Time.{*, given}
+import com.madgag.logic.{ChannelMapping, ChannelSignals, Event}
 
 import java.time.Duration
 

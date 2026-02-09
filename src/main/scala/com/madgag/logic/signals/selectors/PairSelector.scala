@@ -1,9 +1,10 @@
 package com.madgag.logic.signals.selectors
 
-import com.madgag.logic.Time.*
+import com.madgag.logic.ChannelSignals
 import com.madgag.logic.signals.triggers.Criterion.Trigger
 import com.madgag.logic.signals.validation.SignalValidation.TransitionPair
-import com.madgag.logic.{ChannelSignals, Time}
+import com.madgag.logic.time.Time
+import com.madgag.logic.time.Time.*
 import spire.math.Interval.atOrAbove
 
 

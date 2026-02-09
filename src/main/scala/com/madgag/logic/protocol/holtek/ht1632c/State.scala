@@ -1,11 +1,12 @@
 package com.madgag.logic.protocol.holtek.ht1632c
 
 import cats.kernel.Order.*
-import com.madgag.logic.Time.*
+import com.madgag.logic.ChannelSignals
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.ChipSelect
 import com.madgag.logic.protocol.holtek.ht1632c.operations.DataOperation.WriteMode
 import com.madgag.logic.protocol.holtek.ht1632c.signals.ReadOrWrite.Write
-import com.madgag.logic.{ChannelSignals, Time}
+import com.madgag.logic.time.Time
+import com.madgag.logic.time.Time.*
 import com.madgag.scala.collection.decorators.*
 import scodec.bits.BitVector
 

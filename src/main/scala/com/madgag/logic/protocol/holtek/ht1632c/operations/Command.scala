@@ -5,12 +5,12 @@ import com.madgag.logic.BoundedInterval
 import com.madgag.logic.BoundedInterval.*
 import com.madgag.logic.bits.Nibble
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.COM.{DisplayLayout, OpenDrain}
-import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.SyncRole.ClockSource
-import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.SyncRole.ClockSource.{ExternalClock, OnChipOscillator}
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.PWM.Levels
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.Setting
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.Setting.OffOn.{Off, On}
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.Setting.{OffOn, Switchable}
+import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.SyncRole.ClockSource
+import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.SyncRole.ClockSource.{ExternalClock, OnChipOscillator}
 import com.madgag.logic.protocol.holtek.ht1632c.signals.MixedBits
 import com.madgag.logic.protocol.holtek.ht1632c.signals.MixedBits.Parser
 import com.madgag.logic.protocol.holtek.ht1632c.signals.ReadOrWrite.Write

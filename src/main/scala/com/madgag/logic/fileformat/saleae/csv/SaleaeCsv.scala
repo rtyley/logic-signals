@@ -2,7 +2,8 @@ package com.madgag.logic.fileformat.saleae.csv
 
 import com.github.tototoshi.csv.{CSVFormat, DefaultCSVFormat}
 import com.madgag.logic.fileformat.{CSVDetails, CSVHeader, CSVLogicFormat}
-import com.madgag.logic.{ChannelMapping, ChannelSignals, Time, TimeParser}
+import com.madgag.logic.time.{Time, TimeParser}
+import com.madgag.logic.{ChannelMapping, ChannelSignals}
 
 object SaleaeCsv {
   val CsvFormat: CSVFormat = new DefaultCSVFormat {

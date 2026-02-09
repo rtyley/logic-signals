@@ -1,6 +1,7 @@
 package com.madgag.logic
 
-import com.madgag.logic.Time.*
+import com.madgag.logic.time.Time.*
+import com.madgag.logic.time.{Time, TimeParser}
 import com.madgag.scala.collection.decorators.*
 
 case class ChannelMapping[C](fieldsInPreferredOrder: (String, C)*) {

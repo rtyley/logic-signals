@@ -1,8 +1,9 @@
-package com.madgag.logic
+package com.madgag.logic.time
 
 import com.madgag.logic.Isomorphisms.*
-import com.madgag.logic.Time.Delta
-import com.madgag.logic.TimeParser.TimeFormat
+import com.madgag.logic.time.Time
+import com.madgag.logic.time.Time.Delta
+import com.madgag.logic.time.TimeParser.TimeFormat
 
 import java.lang.Math.round
 import java.time.Duration.ofNanos

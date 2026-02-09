@@ -1,6 +1,7 @@
 package com.madgag.logic
 
-import com.madgag.logic.Time.*
+import com.madgag.logic.time.Time
+import com.madgag.logic.time.Time.*
 import com.madgag.scala.collection.decorators.*
 import org.scalacheck.Gen.Choose
 import org.scalacheck.{Arbitrary, Gen}
