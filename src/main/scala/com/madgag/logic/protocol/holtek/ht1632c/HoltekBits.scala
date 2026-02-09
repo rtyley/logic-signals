@@ -1,6 +1,7 @@
 package com.madgag.logic.protocol.holtek.ht1632c
 
 import cats.*
+import cats.syntax.*
 import cats.kernel.Order.*
 import com.madgag.logic.BoundedInterval.*
 import com.madgag.logic.fileformat.Foo
@@ -10,9 +11,10 @@ import com.madgag.logic.protocol.holtek.ht1632c.Channel.{ChipSelect, Clock}
 import com.madgag.logic.protocol.holtek.ht1632c.operations.*
 import com.madgag.logic.protocol.holtek.ht1632c.operations.DataOperation.WriteMode
 import com.madgag.logic.protocol.holtek.ht1632c.signals.TimingCharacteristics
-import com.madgag.logic.time.Time.*
+import com.madgag.logic.time.Time.{given_Time_Delta, *}
 import com.madgag.logic.time.{Time, TimeParser, Timed, TimedF}
 import com.madgag.logic.{BoundedInterval, ChannelMapping, ChannelSignals, toBoundedIntervalOpt}
+import com.madgag.scala.collection.decorators.*
 
 import java.time.Duration
 import scala.collection.immutable.SortedMap
@@ -54,10 +56,14 @@ object HoltekBits {
       boundedInterval <- opSignal.interval.toBoundedIntervalOpt.toSeq
       op <- opSignal.operation.toSeq
     } yield Timed(boundedInterval, chipSelectChannel -> op)).sortBy(_.interval.lowerValueBound.a))
+
+  import cats.implicits._
   
-  def ledStatesFromWriteSignalsIn[T: Time](opsByChip: Map[ChipSelect, SortedMap[T, Operation]]): ChannelSignals[T, ChipLed] = (for {
-    (chip, opsByTime) <- opsByChip
-  } yield State.signalsByLed(opsByTime.collect { case (time, w: WriteMode) => time -> w }).mapKeys(la => ChipLed(chip, la))).reduce(_ merge _)
+  def ledStatesFromWriteSignalsIn[T: Time](distOps: TimedDistributedOperations[T])(using Functor[TimedF[T]]): ChannelSignals[T, ChipLed] = (for {
+    (chip, opsByTime) <- distOps.ops.groupUp(_.value._1)(_.map(_.map(_._2)))
+  } yield State.signalsByLed(
+    SortedMap.from(opsByTime.collect { case Timed(interval, w: WriteMode) => interval.lowerValueBound.a -> w })
+  ).mapKeys(la => ChipLed(chip, la))).reduce(_ merge _)
 
 
   def commandsFrom[T: Time](opsByChip: Map[ChipSelect, SortedMap[T, Operation]]): SortedMap[T, (ChipSelect, Seq[Command])] = (for {

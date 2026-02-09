@@ -1,4 +1,4 @@
-Time [s],CS Leader,CS Follower,Write,Data
+Time [s],CS Follower,CS Leader,Write,Data
 25.356592680,1,1,1,0
 29.033517120,1,1,1,1
 29.033528160,1,0,1,1

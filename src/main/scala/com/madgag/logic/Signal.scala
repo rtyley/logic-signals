@@ -48,7 +48,7 @@ trait Signal[T: Time] {
 
 
   lazy val summary: String = durations().map {
-    (duration: Duration, g: Boolean) => s"${if (g) "↗" else "↘"} ${duration.format(1, NANOS)}"
+    (duration: Duration, g: Boolean) => s"${if (g) "↗" else "↘"} ${duration.format(2, NANOS)}"
   }.mkString(" ")
 }
 
