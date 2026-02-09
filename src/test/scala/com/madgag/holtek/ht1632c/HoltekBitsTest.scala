@@ -1,17 +1,18 @@
 package com.madgag.holtek.ht1632c
 
 import com.madgag.logic.*
-import com.madgag.logic.Time.*
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.{ChipSelect, Clock, Data}
 import com.madgag.logic.protocol.holtek.ht1632c.HoltekBits.operationSignalsFor
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.COM.DisplayLayout.`32x8`
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.COM.OpenDrain.NMOS
-import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.SyncRole.RCLeader
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.Setting.OffOn.{Off, On}
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.Setting.Switchable.{Blink, LedDutyCycleGenerator, SystemOscillator}
+import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.SyncRole.RCLeader
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.{COM, PWM}
 import com.madgag.logic.protocol.holtek.ht1632c.operations.{Command, CommandMode, Operation}
 import com.madgag.logic.protocol.holtek.ht1632c.{Channel, ChipLed, HoltekBits}
+import com.madgag.logic.time.Time.*
+import com.madgag.logic.time.TimeParser
 import com.madgag.scala.collection.decorators.*
 import org.scalatest.OptionValues
 import org.scalatest.flatspec.AnyFlatSpec
@@ -53,6 +54,9 @@ class HoltekBitsTest extends AnyFlatSpec with should.Matchers with OptionValues 
       Blink(Off),
       LedDutyCycleGenerator(Off)
     ).map(CommandMode(_))
+
+    val distOps = HoltekBits.operationsFor(boom)
+    println(distOps)
   }
 
 

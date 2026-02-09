@@ -1,22 +1,20 @@
 package com.madgag.logic
 
-import com.madgag.logic.Time.Delta
 import com.madgag.logic.fileformat.vcd.ValueChangeDump
 import com.madgag.logic.fileformat.vcd.ValueChangeDump.Header
 import com.madgag.logic.fileformat.vcd.ValueChangeDump.Header.{Scope, TimeScale, VarDef}
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.ChipSelect.{Follower, Leader}
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.Clock.Write
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.Data
-import com.madgag.logic.protocol.holtek.ht1632c.operations.Operation
+import com.madgag.logic.protocol.holtek.ht1632c.operations.TimedDistributedOperations
 import com.madgag.logic.protocol.holtek.ht1632c.{Channel, HoltekBits}
+import com.madgag.logic.time.Time.Delta
 import fastparse.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 
 import java.nio.file.{Files, Paths}
-import java.time.Duration
 import java.time.Duration.ofNanos
-import scala.collection.immutable.SortedMap
 
 
 class ValueChangeDumpTest extends AnyFlatSpec with should.Matchers {
@@ -76,7 +74,7 @@ class ValueChangeDumpTest extends AnyFlatSpec with should.Matchers {
       "D7" -> Data,
     ))
 
-    val boom: Map[Channel.ChipSelect, SortedMap[Delta, Operation]] = HoltekBits.operationsFor(chunky)
+    val boom: TimedDistributedOperations[Delta] = HoltekBits.operationsFor(chunky)
     println(boom)
 
   }

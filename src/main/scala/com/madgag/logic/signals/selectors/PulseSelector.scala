@@ -1,8 +1,9 @@
 package com.madgag.logic.signals.selectors
 
+import com.madgag.logic.ChannelSignals
 import com.madgag.logic.Signal.ChangeType
 import com.madgag.logic.signals.triggers.ChannelGroup
-import com.madgag.logic.{ChannelSignals, Time}
+import com.madgag.logic.time.Time
 
 trait IntervalSelector[+C] {
   def selectIn[T: Time, C1 >: C](signals: ChannelSignals[T, C1]): Iterable[ChannelSignals[T, C1]]

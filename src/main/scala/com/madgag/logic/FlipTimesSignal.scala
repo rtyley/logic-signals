@@ -5,7 +5,8 @@ import cats.kernel.Order.*
 import com.madgag.logic.*
 import com.madgag.logic.BoundedInterval.*
 import com.madgag.logic.FlipTimesSignal.zipWithFlippingBoolean
-import com.madgag.logic.Time.*
+import com.madgag.logic.time.Time
+import com.madgag.logic.time.Time.*
 import spire.math.interval.{Closed, Open, Unbound, ValueBound}
 import spire.math.{Empty, Interval}
 

@@ -33,6 +33,8 @@ object DataOperation {
   }
 
   case class Data(value: BitVector) {
+    require(value.size == 4)
+
     override val toString: String = value.toIndexedSeq.map(b => if (b) "💡" else "⚫").mkString
   }
 

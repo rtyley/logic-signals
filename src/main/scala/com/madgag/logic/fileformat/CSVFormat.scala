@@ -1,8 +1,9 @@
 package com.madgag.logic.fileformat
 
 import com.github.tototoshi.csv.{CSVReader, CSVWriter}
+import com.madgag.logic.ChannelSignals
 import com.madgag.logic.Isomorphisms.<=>
-import com.madgag.logic.{ChannelSignals, Time}
+import com.madgag.logic.time.Time
 
 import scala.util.Using
 

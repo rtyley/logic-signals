@@ -5,7 +5,8 @@ import cats.kernel.Order.*
 import com.gu.time.duration.formatting.*
 import com.madgag.logic.*
 import com.madgag.logic.BoundedInterval.*
-import com.madgag.logic.Time.*
+import com.madgag.logic.time.Time
+import com.madgag.logic.time.Time.*
 import spire.math.Interval
 
 import java.time.Duration

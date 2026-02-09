@@ -1,10 +1,11 @@
 package com.madgag.logic.fileformat.gusmanb
 
 import com.github.tototoshi.csv.{CSVReader, CSVWriter}
+import com.madgag.logic.ChannelMapping
 import com.madgag.logic.fileformat.Foo
 import com.madgag.logic.fileformat.saleae.csv.SaleaeCsv
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.{ChipSelect, Clock, Data}
-import com.madgag.logic.{ChannelMapping, TimeParser}
+import com.madgag.logic.time.TimeParser
 import org.scalatest.Inspectors
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should

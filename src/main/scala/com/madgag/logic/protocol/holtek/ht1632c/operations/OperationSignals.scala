@@ -1,18 +1,19 @@
 package com.madgag.logic.protocol.holtek.ht1632c.operations
 
 import cats.kernel.Order.*
-import com.madgag.logic.Time.*
+import com.madgag.logic.Signal
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.Clock
 import com.madgag.logic.protocol.holtek.ht1632c.signals.MixedBits.Parser
-import com.madgag.logic.protocol.holtek.ht1632c.signals.{MixedBits, RWBit}
-import com.madgag.logic.signals.validation.SignalValidation.ValidationResult
-import com.madgag.logic.{Signal, Time}
+import com.madgag.logic.protocol.holtek.ht1632c.signals.RWBit
+import com.madgag.logic.time.Time
+import com.madgag.logic.time.Time.*
 import spire.math.Interval
 import spire.math.interval.ValueBound
 
 /**
  * Contains the relevant line signals (Read & Write clock, and Data line) sent while a Chip Select (CS) line
- * is held low for transmission of an [[Operation]] (ie [[CommandMode]], [[WriteMode]] or [[ReadMode]])
+ * is held low for transmission of an [[Operation]] (ie [[CommandMode]],
+ * [[DataOperation.WriteMode]] or [[DataOperation.ReadMode]])
  */
 case class OperationSignals[T: Time](readWriteClocks: Map[Clock, Signal[T]], data: Signal[T]) {
 

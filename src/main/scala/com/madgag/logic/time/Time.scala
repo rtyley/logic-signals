@@ -1,6 +1,7 @@
-package com.madgag.logic
+package com.madgag.logic.time
 
 import cats.kernel.Order
+import com.madgag.logic.{BoundedInterval, Direction}
 import spire.algebra.{AdditiveMonoid, Order}
 import spire.math.*
 import spire.math.interval.ValueBound
