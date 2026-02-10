@@ -2,6 +2,8 @@ package com.madgag.logic.protocol.holtek.ht1632c.operations
 
 import com.madgag.logic.bits.Nibble
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.*
+import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.COM.DisplayLayout.{`24x16`, `32x8`}
+import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.COM.OpenDrain.{NMOS, PMOS}
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.Setting.OffOn.On
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.Setting.Switchable.LedDutyCycleGenerator
 import com.madgag.logic.protocol.holtek.ht1632c.operations.Command.SyncRole.*
@@ -28,5 +30,14 @@ class CommandTest extends AnyFlatSpec with should.Matchers {
     Command(bin"101000010") shouldBe PWM(2)
     Command(bin"101000110") shouldBe PWM(4)
     Command(bin"101001110") shouldBe PWM(8)
+  }
+
+  it should "parse COM options" in {
+    Command(bin"001000000") shouldBe COM(NMOS, `32x8`)
+
+    Command(Nibble(bin"0010"), Nibble(bin"0100")) shouldBe COM(NMOS, `24x16`)
+    Command(bin"001001000") shouldBe COM(NMOS, `24x16`)
+
+    Command(bin"001011000") shouldBe COM(PMOS, `24x16`)
   }
 }

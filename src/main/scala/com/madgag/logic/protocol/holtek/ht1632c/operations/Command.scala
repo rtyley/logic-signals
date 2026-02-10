@@ -167,7 +167,7 @@ object Command {
     override def commandFor(content: Nibble): Option[Command] = {
       def ordinal(contentIndex: Int): Int = if content.bitVector(contentIndex) then 1 else 0
 
-      Some(COM(OpenDrain.fromOrdinal(ordinal(3)), DisplayLayout.fromOrdinal(ordinal(2))))
+      Some(COM(OpenDrain.fromOrdinal(ordinal(0)), DisplayLayout.fromOrdinal(ordinal(1))))
     }
 
     /**
