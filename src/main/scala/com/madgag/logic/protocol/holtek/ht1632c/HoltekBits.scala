@@ -1,7 +1,6 @@
 package com.madgag.logic.protocol.holtek.ht1632c
 
 import cats.*
-import cats.syntax.*
 import cats.kernel.Order.*
 import com.madgag.logic.BoundedInterval.*
 import com.madgag.logic.fileformat.Foo
@@ -11,10 +10,9 @@ import com.madgag.logic.protocol.holtek.ht1632c.Channel.{ChipSelect, Clock}
 import com.madgag.logic.protocol.holtek.ht1632c.operations.*
 import com.madgag.logic.protocol.holtek.ht1632c.operations.DataOperation.WriteMode
 import com.madgag.logic.protocol.holtek.ht1632c.signals.TimingCharacteristics
-import com.madgag.logic.time.Time.{given_Time_Delta, *}
+import com.madgag.logic.time.Time.*
 import com.madgag.logic.time.{Time, TimeParser, Timed, TimedF}
-import com.madgag.logic.{BoundedInterval, ChannelMapping, ChannelSignals, toBoundedIntervalOpt}
-import com.madgag.scala.collection.decorators.*
+import com.madgag.logic.{ChannelMapping, ChannelSignals, toBoundedIntervalOpt}
 
 import java.time.Duration
 import scala.collection.immutable.SortedMap
@@ -48,24 +46,20 @@ object HoltekBits {
     chipSelectChannel <- channelSignals.data.keys.toSeq.collect { case cs: ChipSelect => cs }
     opSignal <- operationSignalsFor(channelSignals, chipSelectChannel)
   } yield chipSelectChannel -> opSignal
-  
-  def operationsFor[T: Time](channelSignals: ChannelSignals[T, Channel]): TimedDistributedOperations[T] =
-    DistributedOperations[TimedF[T]]((for {
+
+  def operationsFor[T: Time](channelSignals: ChannelSignals[T, Channel]): ChipSeq[Timed[T, OperationSignals[T]]] =
+    (for {
       chipSelectChannel <- channelSignals.data.keySet.collect { case cs: ChipSelect => cs }.toSeq
       opSignal <- operationSignalsFor(channelSignals, chipSelectChannel)
       boundedInterval <- opSignal.interval.toBoundedIntervalOpt.toSeq
-      op <- opSignal.operation.toSeq
-    } yield Timed(boundedInterval, chipSelectChannel -> op)).sortBy(_.interval.lowerValueBound.a))
+    } yield ChipVal(chipSelectChannel,Timed(boundedInterval,  opSignal))).sortBy(_.value.interval.lowerValueBound.a)
 
-  import cats.implicits._
-  
-  def ledStatesFromWriteSignalsIn[T: Time](distOps: TimedDistributedOperations[T])(using Functor[TimedF[T]]): ChannelSignals[T, ChipLed] = (for {
-    (chip, opsByTime) <- distOps.ops.groupUp(_.value._1)(_.map(_.map(_._2)))
+  def ledStatesFromWriteSignalsIn[T: Time](ops: ChipSeq[Timed[T, Operation]])(using Functor[TimedF[T]]): ChannelSignals[T, ChipLed] = (for {
+    (chip, timedOps) <- ops.groupByChip
   } yield State.signalsByLed(
-    SortedMap.from(opsByTime.collect { case Timed(interval, w: WriteMode) => interval.lowerValueBound.a -> w })
+    SortedMap.from(timedOps.collect { case Timed(interval, w: WriteMode) => interval.lowerValueBound.a -> w })
   ).mapKeys(la => ChipLed(chip, la))).reduce(_ merge _)
-
-
+  
   def commandsFrom[T: Time](opsByChip: Map[ChipSelect, SortedMap[T, Operation]]): SortedMap[T, (ChipSelect, Seq[Command])] = (for {
     (chip, opsByTime) <- opsByChip
   } yield opsByTime.collect { case (time, c: CommandMode) => time -> (chip, c.commands) }).reduce(_ ++ _)

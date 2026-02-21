@@ -1,14 +1,14 @@
 package com.madgag.logic.protocol.holtek.ht1632c.operations
 
 import cats.kernel.Order.*
-import com.madgag.logic.Signal
+import com.madgag.logic.BoundedInterval.*
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.Clock
+import com.madgag.logic.protocol.holtek.ht1632c.operations.OperationSignals.operationParser
 import com.madgag.logic.protocol.holtek.ht1632c.signals.MixedBits.Parser
 import com.madgag.logic.protocol.holtek.ht1632c.signals.RWBit
 import com.madgag.logic.time.Time
 import com.madgag.logic.time.Time.*
-import spire.math.Interval
-import spire.math.interval.ValueBound
+import com.madgag.logic.{BoundedInterval, Signal}
 
 /**
  * Contains the relevant line signals (Read & Write clock, and Data line) sent while a Chip Select (CS) line
@@ -17,8 +17,8 @@ import spire.math.interval.ValueBound
  */
 case class OperationSignals[T: Time](readWriteClocks: Map[Clock, Signal[T]], data: Signal[T]) {
 
-  val interval: Interval[T] = (readWriteClocks.values.toSeq :+ data).map(_.interval).reduce(_ | _)
-  val startTime: T = interval.lowerBound.asInstanceOf[ValueBound[T]].a
+  val interval: BoundedInterval[T] = (readWriteClocks.values.toSeq :+ data).map(_.interval).reduce(_ boundedUnion _)
+  val startTime: T = interval.lowerValueBound.a
   
   lazy val mixedBits: Seq[RWBit] = (for {
     (clock, clockSignal) <- readWriteClocks
@@ -34,12 +34,14 @@ case class OperationSignals[T: Time](readWriteClocks: Map[Clock, Signal[T]], dat
    * pin returns to "0", a new operation mode ID should be issued first.''
    *
    * The Command operation supports multiple commands, and the Read & Write operations support successive
-   * addressing, but you can't issue multiple distinct  operations (with the appropriate opening 3-bit
+   * addressing, but you can't issue multiple distinct operations (with the appropriate opening 3-bit
    * command code) without resetting the Chip-Select line.
    */
-  lazy val operation: Option[Operation] = summon[Parser[Operation]].parse(mixedBits).map(_._1)
+  lazy val operation: Option[Operation] = operationParser.parse(mixedBits).map(_._1)
 
   lazy val opOrBadBits: Either[String, Operation] = operation.toRight(mixedBits.map(_.symbol).mkString)
+}
 
-  //val timingValidation: ValidationResult[Unit] = 
+object OperationSignals {
+  val operationParser: Parser[Operation] = summon[Parser[Operation]]
 }

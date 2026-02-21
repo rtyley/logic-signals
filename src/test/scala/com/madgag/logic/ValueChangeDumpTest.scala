@@ -6,7 +6,6 @@ import com.madgag.logic.fileformat.vcd.ValueChangeDump.Header.{Scope, TimeScale,
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.ChipSelect.{Follower, Leader}
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.Clock.Write
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.Data
-import com.madgag.logic.protocol.holtek.ht1632c.operations.TimedDistributedOperations
 import com.madgag.logic.protocol.holtek.ht1632c.{Channel, HoltekBits}
 import com.madgag.logic.time.Time.Delta
 import fastparse.*
@@ -74,8 +73,6 @@ class ValueChangeDumpTest extends AnyFlatSpec with should.Matchers {
       "D7" -> Data,
     ))
 
-    val boom: TimedDistributedOperations[Delta] = HoltekBits.operationsFor(chunky)
-    println(boom)
-
+    println(HoltekBits.operationsFor(chunky))
   }
 }
