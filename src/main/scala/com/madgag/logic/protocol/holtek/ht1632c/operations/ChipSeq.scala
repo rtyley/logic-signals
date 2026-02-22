@@ -19,6 +19,14 @@ type ChipSeq[A] = Seq[ChipVal[A]]
 extension [A](chipSeq: ChipSeq[A])
   def groupByChip: Map[ChipSelect, Seq[A]] = chipSeq.groupMap(_.chipSelect)(_.value)
 
+  def groupByUpdate: Seq[Map[ChipSelect, A]] = chipSeq.foldLeft(List.empty[Map[ChipSelect, A]]) {
+    (acc, chipVal) =>
+      val newEntry = chipVal.chipSelect -> chipVal.value
+      acc.headOption.filter(_.contains(chipVal.chipSelect)).fold(Map(newEntry) :: acc) { m =>
+        (m + newEntry) :: acc.tail
+      }.reverse
+  }
+
   def mapChipVal[B](f: A => B): ChipSeq[B] = chipSeq.map(_.map(f))
 
   def flatMapChipVal[B](f: A => Iterable[B]): ChipSeq[B] = chipSeq.flatMap(_.flatMap(f))
