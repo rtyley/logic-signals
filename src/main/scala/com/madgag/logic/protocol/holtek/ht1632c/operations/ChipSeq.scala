@@ -1,9 +1,16 @@
 package com.madgag.logic.protocol.holtek.ht1632c.operations
 
-import cats.syntax.all.*
 import cats.*
+import cats.kernel.Order.*
+import cats.syntax.all.*
+import com.madgag.logic.BoundedInterval.*
 import com.madgag.logic.protocol.holtek.ht1632c.Channel.ChipSelect
+import com.madgag.logic.protocol.holtek.ht1632c.ChipLed
+import com.madgag.logic.protocol.holtek.ht1632c.operations.DataOperation.WriteMode
+import com.madgag.logic.time.Time.orderForTime
 import com.madgag.logic.time.{Time, Timed}
+
+import java.time.Duration
 
 case class ChipVal[A](chipSelect: ChipSelect, value: A) {
   def map[B](f: A => B): ChipVal[B] = copy(value = f(value))
@@ -17,15 +24,8 @@ case class ChipVal[A](chipSelect: ChipSelect, value: A) {
 type ChipSeq[A] = Seq[ChipVal[A]]
 
 extension [A](chipSeq: ChipSeq[A])
-  def groupByChip: Map[ChipSelect, Seq[A]] = chipSeq.groupMap(_.chipSelect)(_.value)
 
-  def groupByUpdate: Seq[Map[ChipSelect, A]] = chipSeq.foldLeft(List.empty[Map[ChipSelect, A]]) {
-    (acc, chipVal) =>
-      val newEntry = chipVal.chipSelect -> chipVal.value
-      acc.headOption.filter(_.contains(chipVal.chipSelect)).fold(Map(newEntry) :: acc) { m =>
-        (m + newEntry) :: acc.tail
-      }.reverse
-  }
+  def groupByChip: Map[ChipSelect, Seq[A]] = chipSeq.groupMap(_.chipSelect)(_.value)
 
   def mapChipVal[B](f: A => B): ChipSeq[B] = chipSeq.map(_.map(f))
 
@@ -33,6 +33,17 @@ extension [A](chipSeq: ChipSeq[A])
 
 extension [T: Time, A](chipSeq: ChipSeq[Timed[T,A]])
   def dropTime: ChipSeq[A] = chipSeq.mapChipVal(_.value)
+
+  def splitByGaps(minGapDuration: Duration): Seq[Timed[T, ChipSeq[A]]] = chipSeq.foldLeft(List.empty[ChipSeq[Timed[T,A]]]) {
+    (acc, chipVal) =>
+      acc.headOption.filter(x => Time.between(x.map(_.value.interval.upperValueBound.a).max, chipVal.value.interval.lowerValueBound.a) < minGapDuration)
+        .fold(Seq(chipVal) :: acc) { sameChunk => (sameChunk :+ chipVal) :: acc.tail }
+  }.reverse.map { (entry: ChipSeq[Timed[T,A]]) => Timed(entry.map(_.value.interval).reduce(_ boundedUnion _), entry.dropTime) }
+
+extension (chipSeq: ChipSeq[WriteMode])
+  def resultingChipLedState: Map[ChipLed, Boolean] = chipSeq.foldLeft(Map.empty) {
+    (acc, chipVal) => acc ++ chipVal.value.writesByLedAddress.map((la, state) => ChipLed(chipVal.chipSelect, la) -> state)
+  }
 
 extension [F[_], A](chipSeq: ChipSeq[F[A]])
   def mapK[G[_]](fk: F ~> G)(using Functor[F]): ChipSeq[G[A]] = chipSeq.mapChipVal(fk(_))

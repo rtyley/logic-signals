@@ -6,4 +6,6 @@ case class LedAddress(memoryAddress: Int, dataIndex: Int) extends Ordered[LedAdd
   val ledIndex: Int = (memoryAddress * 4) + dataIndex
 
   override def compare(that: LedAddress): Int = ledIndex - that.ledIndex
+
+  lazy val compact: String = s"${memoryAddress}_$dataIndex"
 }

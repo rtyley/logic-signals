@@ -22,6 +22,8 @@ object Channel {
 
   sealed trait ChipSelect extends Channel {
     val index: Int
+
+    val compact: String
   }
   case object ChipSelect extends ChannelGroup[Channel] {
     override def includes[C1 >: Channel](channel: C1): Boolean = channel.isInstanceOf[ChipSelect]
@@ -30,9 +32,11 @@ object Channel {
     
     case object Leader extends ChipSelect {
       val index: Int = 0
+      val compact: String = "L"
     }
     case class Follower(index: Int) extends ChipSelect {
       require(index > 0)
+      val compact: String = s"F$index"
     }
     object Follower {
       val One: Follower = Follower(1)
