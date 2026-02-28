@@ -22,7 +22,11 @@ case class State(memoryMap: Vector[BitVector]) {
   })
 }
 
-case class ChipLed(chipSelect: ChipSelect, ledAddress: LedAddress)
+case class ChipLed(chipSelect: ChipSelect, ledAddress: LedAddress) {
+  lazy val compact: String = s"${chipSelect.compact}:${ledAddress.compact}"
+
+  override def toString: String = compact
+}
 object ChipLed {
   given Ordering[ChipLed] = Ordering.by(cl => (cl.chipSelect, cl.ledAddress))
 }
