@@ -13,10 +13,10 @@ jobs:
   test:
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v4
-      - uses: guardian/setup-scala@v1
+      - uses: actions/checkout@v7
+      - uses: guardian/setup-scala@v2
       - name: Build and Test
-        run: sbt -v test
+        run: sbt -v testFull
       - name: Test Summary
         uses: test-summary/action@v2
         with:
