@@ -55,7 +55,7 @@ class ValueChangeDumpTest extends AnyFlatSpec with should.Matchers {
   }
 
   it should "parse an entire file" in {
-    val vcdText = Files.readString(Paths.get(getClass.getClassLoader.getResource("wokwi-logic.vcd").toURI))
+    val vcdText = os.read(os.resource / "wokwi-logic.vcd")
     val vcd: ValueChangeDump = parse(vcdText, ValueChangeDump.parser(_)).get.value
     val valueChanges = vcd.dataSection.valueChanges
     valueChanges should not be empty
