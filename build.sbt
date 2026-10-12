@@ -4,12 +4,9 @@ import sbtversionpolicy.withsbtrelease.ReleaseVersion
 organization := "com.madgag"
 licenses := Seq(License.Apache2)
 
-scalaVersion := "3.3.8"
+scalaVersion := "3.9.0"
 
-scalacOptions := Seq("-deprecation", "-release:21")
-
-Test / testOptions +=
-  Tests.Argument(TestFrameworks.ScalaTest, "-u", s"test-results/scala-${scalaVersion.value}", "-o")
+scalacOptions := Seq("-deprecation", "-release:25")
 
 val spireVersion = "0.18.0"
 libraryDependencies ++= Seq(
